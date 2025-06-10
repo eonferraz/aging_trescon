@@ -335,7 +335,6 @@ def main():
                         # Converter colunas de valor para número
                         df_tit[colunas['valor_tit']] = pd.to_numeric(df_tit[colunas['valor_tit']], errors='coerce')
                         df_baix[colunas['valor_baix']] = pd.to_numeric(df_baix[colunas['valor_baix']], errors='coerce')
-
             
                         # Processar conciliação
                         df_conc = processar_conciliacao(df_tit, df_baix, colunas)
