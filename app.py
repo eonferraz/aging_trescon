@@ -32,7 +32,7 @@ st.markdown("""
 
 # --- ARQUIVOS ---
 with st.expander("1. Fonte de Dados", expanded=True):
-usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
+    usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
 
 if usar_arquivo_unico:
     arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
@@ -55,7 +55,7 @@ abas_extra, xls_extra = ler_abas(arquivo_extra)
 
 if xls_base:
     with st.expander("2. Seleção de Abas e Pré-visualização", expanded=True):
-    col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2)
     with col1:
         st.markdown("### Títulos")
         aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
