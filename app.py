@@ -94,6 +94,13 @@ if xls_base:
         'Valor Pago': 'sum'
     }).reset_index()
 
+
+    # Forçar tipos iguais para merge
+    df_tit['Documento'] = df_tit['Documento'].astype(str).str.strip()
+    df_tit['Fornecedor'] = df_tit['Fornecedor'].astype(str).str.strip()
+    pagamentos_agrupados['Documento'] = pagamentos_agrupados['Documento'].astype(str).str.strip()
+    pagamentos_agrupados['Fornecedor'] = pagamentos_agrupados['Fornecedor'].astype(str).str.strip()
+
     df_conc = pd.merge(df_tit, pagamentos_agrupados, on=['Documento', 'Fornecedor'], how='left')
     df_conc['Valor Pago'] = df_conc['Valor Pago'].fillna(0)
     df_conc['Diferença'] = df_conc['Valor Título'] - df_conc['Valor Pago']
