@@ -325,8 +325,12 @@ def main():
                         progress_bar = st.progress(0)
                         
                         # Preparar dados
-                        df_tit['Documento'] = df_tit[doc_tit].astype(str)
-                        df_baix['Documento'] = df_baix[doc_baix].astype(str)
+                        #df_tit['Documento'] = df_tit[doc_tit].astype(str)
+                        #df_baix['Documento'] = df_baix[doc_baix].astype(str)
+
+                        # Preparar dados - Normalizar documento removendo zeros à esquerda
+                        df_tit['Documento'] = df_tit[doc_tit].astype(str).str.lstrip('0')
+                        df_baix['Documento'] = df_baix[doc_baix].astype(str).str.lstrip('0')
                         
                         # Converter colunas de valor para número
                         df_tit[colunas['valor_tit']] = pd.to_numeric(df_tit[colunas['valor_tit']], errors='coerce')
