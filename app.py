@@ -98,12 +98,14 @@ if xls_base:
                     col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
                     df_tit['Fornecedor'] = df_tit[col_forn_tit]
 
+    
             col1_valtit, col2_valtit = st.columns(2)
             with col1_valtit:
                 col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
                 col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
             with col2_valtit:
                 col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
+        
 
         with col2:
             usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
