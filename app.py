@@ -37,7 +37,7 @@ with st.expander("1. Fonte de Dados", expanded=True):
             arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
 
 # Função para ler abas
-@st.cache_data
+#@st.cache_data
 
 def ler_abas(arquivo):
     if arquivo:
