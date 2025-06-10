@@ -149,6 +149,19 @@ if xls_base:
 
     # --- TRATAMENTO ---
 
+    import difflib
+    fornecedores_tit = df_tit['Fornecedor'].dropna().unique().tolist()
+
+    def extrair_forn_similar(texto):
+        try:
+            melhores = difflib.get_close_matches(str(texto), fornecedores_tit, n=1, cutoff=0.4)
+            return melhores[0] if melhores else None
+        except:
+            return None
+
+    if usar_extracao_baix and campo_combinado_baix:
+        df_baix['Fornecedor'] = df_baix[campo_combinado_baix].apply(extrair_forn_similar)
+
     # Conversão de datas e valores
     
 
