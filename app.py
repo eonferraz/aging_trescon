@@ -327,8 +327,12 @@ def main():
                         # Preparar dados
                         df_tit['Documento'] = df_tit[doc_tit].astype(str)
                         df_baix['Documento'] = df_baix[doc_baix].astype(str)
-                        progress_bar.progress(20)
                         
+                        # Converter colunas de valor para número
+                        df_tit[colunas['valor_tit']] = pd.to_numeric(df_tit[colunas['valor_tit']], errors='coerce')
+                        df_baix[colunas['valor_baix']] = pd.to_numeric(df_baix[colunas['valor_baix']], errors='coerce')
+
+            
                         # Processar conciliação
                         df_conc = processar_conciliacao(df_tit, df_baix, colunas)
                         progress_bar.progress(60)
