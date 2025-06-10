@@ -71,7 +71,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Funções utilitárias
-@st.cache_data
+#@st.cache_data
 def load_data(uploaded_file):
     """Carrega dados com cache para melhor performance."""
     if uploaded_file is None:
