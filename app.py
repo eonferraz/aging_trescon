@@ -90,22 +90,27 @@ if xls_base:
                         return pd.Series([None, None])
                 df_tit[['Documento', 'Fornecedor']] = df_tit[campo_combinado].apply(extrair_info)
             else:
+                colunas_tit = df_tit.columns.tolist()
+                sugestao_doc_tit = next((c for c in colunas_tit if 'doc' in c.lower()), colunas_tit[0])
+                sugestao_forn_tit = next((c for c in colunas_tit if 'forn' in c.lower() or 'cliente' in c.lower()), colunas_tit[0])
+
                 col1_tit, col2_tit = st.columns(2)
                 with col1_tit:
-                    col_doc_tit = st.selectbox("Coluna de Documento - Títulos", df_tit.columns)
+                    col_doc_tit = st.selectbox("Coluna de Documento - Títulos", colunas_tit, index=colunas_tit.index(sugestao_doc_tit))
                     df_tit['Documento'] = df_tit[col_doc_tit]
                 with col2_tit:
-                    col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
+                    col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", colunas_tit, index=colunas_tit.index(sugestao_forn_tit))
                     df_tit['Fornecedor'] = df_tit[col_forn_tit]
 
-    
-            col1_valtit, col2_valtit = st.columns(2)
-            with col1_valtit:
-                col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
-                col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
-            with col2_valtit:
-                col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
-        
+                valores_tit = df_tit.select_dtypes(include='number').columns.tolist()
+                datas_tit = df_tit.columns[df_tit.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
+
+                col1_valtit, col2_valtit = st.columns(2)
+                with col1_valtit:
+                    col_valor_tit = st.selectbox("Coluna de Valor do Título", valores_tit if valores_tit else df_tit.columns)
+                    col_data_emissao = st.selectbox("Coluna de Emissão", datas_tit if datas_tit else df_tit.columns)
+                with col2_valtit:
+                    col_data_venc = st.selectbox("Coluna de Vencimento", datas_tit if datas_tit else df_tit.columns)
 
         with col2:
             usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
@@ -120,19 +125,26 @@ if xls_base:
                         return pd.Series([None, None])
                 df_baix[['Documento', 'Fornecedor']] = df_baix[campo_combinado_baix].apply(extrair_info_baixa)
             else:
+                colunas_baix = df_baix.columns.tolist()
+                sugestao_doc_baix = next((c for c in colunas_baix if 'doc' in c.lower()), colunas_baix[0])
+                sugestao_forn_baix = next((c for c in colunas_baix if 'forn' in c.lower() or 'cliente' in c.lower()), colunas_baix[0])
+
                 col1_baix, col2_baix = st.columns(2)
                 with col1_baix:
-                    col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
+                    col_doc_baix = st.selectbox("Coluna de Documento - Baixas", colunas_baix, index=colunas_baix.index(sugestao_doc_baix))
                     df_baix['Documento'] = df_baix[col_doc_baix]
                 with col2_baix:
-                    col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
+                    col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", colunas_baix, index=colunas_baix.index(sugestao_forn_baix))
                     df_baix['Fornecedor'] = df_baix[col_forn_baix]
 
-            col1_val, col2_val = st.columns(2)
-            with col1_val:
-                col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
-            with col2_val:
-                col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
+                valores_baix = df_baix.select_dtypes(include='number').columns.tolist()
+                datas_baix = df_baix.columns[df_baix.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
+
+                col1_val, col2_val = st.columns(2)
+                with col1_val:
+                    col_valor_baix = st.selectbox("Coluna de Valor Pago", valores_baix if valores_baix else df_baix.columns)
+                with col2_val:
+                    col_data_baix = st.selectbox("Coluna de Data de Pagamento", datas_baix if datas_baix else df_baix.columns)
 
     # --- TRATAMENTO ---
 
