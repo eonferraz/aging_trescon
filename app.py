@@ -2,38 +2,30 @@ import streamlit as st
 import pandas as pd
 import io
 import re
+from difflib import get_close_matches
 
 st.set_page_config(page_title="Aging", layout="wide")
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------
-# Logo + título lado a lado
-st.markdown(
-    """
+# Logo e título
+st.markdown("""
     <div style="background-color: white; padding: 20px 30px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
         <div style="display: flex; align-items: center; gap: 20px;">
             <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=304,fit=crop,q=95/Aq2B471lDpFnv1BK/logo---trescon-30-anos-mv0jg6Lo2EiV7yLp.png" style="height: 60px;">
             <h1 style="margin: 0; font-size: 2.4em;">Relatório de Aging - Conciliador</h1>
         </div>
     </div>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 st.markdown("""
     <style>
-        * {
-            font-size: 11px !important;
-        }
-        .stSelectbox > div, .stTextInput > div, .stDataFrame * {
-            font-size: 11px !important;
-        }
+        * { font-size: 11px !important; }
+        .stSelectbox > div, .stTextInput > div, .stDataFrame * { font-size: 11px !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- ARQUIVOS ---
+# Upload de arquivos
 with st.expander("1. Fonte de Dados", expanded=True):
     usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
-
     if usar_arquivo_unico:
         arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
         arquivo_extra = None
@@ -44,6 +36,9 @@ with st.expander("1. Fonte de Dados", expanded=True):
         with col2:
             arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
 
+# Função para ler abas
+@st.cache_data
+
 def ler_abas(arquivo):
     if arquivo:
         xls = pd.ExcelFile(arquivo)
@@ -53,182 +48,63 @@ def ler_abas(arquivo):
 abas_base, xls_base = ler_abas(arquivo_base)
 abas_extra, xls_extra = ler_abas(arquivo_extra)
 
+# Regex de extração
+regex_nf = r'NF[:\s]*(\d{5,})'
+regex_cli = r'CLIENTE[:\s]*([A-Z0-9\s\-\/\&\.]+)'
+
+def extrair_info(texto):
+    doc = re.search(regex_nf, str(texto))
+    forn = re.search(regex_cli, str(texto))
+    return pd.Series([doc.group(1) if doc else None, forn.group(1).strip() if forn else None])
+
+# Processamento se arquivos carregados
 if xls_base:
-    with st.expander("2. Seleção de Abas e Pré-visualização", expanded=True):
+    with st.expander("2. Seleção de Abas e Conciliação", expanded=True):
         col1, col2 = st.columns(2)
+
         with col1:
-            st.markdown("### Títulos")
-            aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
-            df_tit = xls_base.parse(aba_titulos)
-            
-            st.dataframe(df_tit.head())
+            aba_tit = st.selectbox("Aba com Títulos", abas_base, key="aba_tit")
+            df_tit = xls_base.parse(aba_tit)
+            campo_tit = st.selectbox("Campo com descrição da NF (Títulos)", df_tit.columns)
+            df_tit[['Documento', 'Fornecedor']] = df_tit[campo_tit].apply(extrair_info)
+            col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
+            col_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
 
         with col2:
-            st.markdown("### Baixas")
             if usar_arquivo_unico:
-                abas_opcoes = [a for a in abas_base if a != aba_titulos]
-                aba_baixas = st.selectbox("Aba com Baixas", abas_opcoes, key="aba_baixas")
-                df_baix = xls_base.parse(aba_baixas)
-            elif xls_extra:
-                aba_baixas = st.selectbox("Aba com Baixas", abas_extra, key="aba_baixas")
-                df_baix = xls_extra.parse(aba_baixas)
+                abas_opc = [a for a in abas_base if a != aba_tit]
+                aba_baix = st.selectbox("Aba com Baixas", abas_opc, key="aba_baix")
+                df_baix = xls_base.parse(aba_baix)
             else:
-                st.warning("Por favor, selecione ou carregue o arquivo de baixas.")
-                st.stop()
-            st.dataframe(df_baix.head())
+                aba_baix = st.selectbox("Aba com Baixas", abas_extra, key="aba_baix")
+                df_baix = xls_extra.parse(aba_baix)
+            campo_baix = st.selectbox("Campo com descrição da NF (Baixas)", df_baix.columns)
+            df_baix[['Documento', 'Fornecedor']] = df_baix[campo_baix].apply(extrair_info)
+            col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
+            col_data_pag = st.selectbox("Coluna de Data Pagamento", df_baix.columns)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            usar_extracao = st.checkbox("Extrair Documento e Fornecedor de campo combinado?", key="extrair_tit")
-            if usar_extracao:
-                campo_combinado = st.selectbox("Campo combinado (Títulos)", df_tit.columns)
-                def extrair_info(texto):
-                    try:
-                        doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
-                        forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
-                        return pd.Series([doc, forn])
-                    except:
-                        return pd.Series([None, None])
-                df_tit[['Documento', 'Fornecedor']] = df_tit[campo_combinado].apply(extrair_info)
-            else:
-                colunas_tit = df_tit.columns.tolist()
-                sugestao_doc_tit = next((c for c in colunas_tit if 'doc' in c.lower()), colunas_tit[0])
-                sugestao_forn_tit = next((c for c in colunas_tit if 'forn' in c.lower() or 'cliente' in c.lower()), colunas_tit[0])
-
-                col1_tit, col2_tit = st.columns(2)
-                with col1_tit:
-                    col_doc_tit = st.selectbox("Coluna de Documento - Títulos", colunas_tit, index=colunas_tit.index(sugestao_doc_tit))
-                    df_tit['Documento'] = df_tit[col_doc_tit]
-                with col2_tit:
-                    col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", colunas_tit, index=colunas_tit.index(sugestao_forn_tit))
-                    df_tit['Fornecedor'] = df_tit[col_forn_tit]
-
-                valores_tit = df_tit.columns.tolist()
-                datas_tit = df_tit.columns[df_tit.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
-
-                col1_valtit, col2_valtit = st.columns(2)
-                with col1_valtit:
-                    col_valor_tit = st.selectbox("Coluna de Valor do Título", valores_tit if valores_tit else df_tit.columns)
-                    col_data_emissao = st.selectbox("Coluna de Emissão", datas_tit if datas_tit else df_tit.columns)
-                with col2_valtit:
-                    col_data_venc = st.selectbox("Coluna de Vencimento", datas_tit if datas_tit else df_tit.columns)
-
-        with col2:
-            usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
-            if usar_extracao_baix:
-                campo_combinado_baix = st.selectbox("Campo combinado (Baixas)", df_baix.columns)
-                def extrair_info_baixa(texto):
-                    try:
-                        doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
-                        forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
-                        return pd.Series([doc, forn])
-                    except:
-                        return pd.Series([None, None])
-                df_baix[['Documento', 'Fornecedor']] = df_baix[campo_combinado_baix].apply(extrair_info_baixa)
-            else:
-                colunas_baix = df_baix.columns.tolist()
-                sugestao_doc_baix = next((c for c in colunas_baix if 'doc' in c.lower()), colunas_baix[0])
-                sugestao_forn_baix = next((c for c in colunas_baix if 'forn' in c.lower() or 'cliente' in c.lower()), colunas_baix[0])
-
-                col1_baix, col2_baix = st.columns(2)
-                with col1_baix:
-                    col_doc_baix = st.selectbox("Coluna de Documento - Baixas", colunas_baix, index=colunas_baix.index(sugestao_doc_baix))
-                    df_baix['Documento'] = df_baix[col_doc_baix]
-                with col2_baix:
-                    col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", colunas_baix, index=colunas_baix.index(sugestao_forn_baix))
-                    df_baix['Fornecedor'] = df_baix[col_forn_baix]
-
-                valores_baix = df_baix.columns.tolist()
-                datas_baix = df_baix.columns[df_baix.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
-
-                col1_val, col2_val = st.columns(2)
-                with col1_val:
-                    col_valor_baix = st.selectbox("Coluna de Valor Pago", valores_baix if valores_baix else df_baix.columns)
-                with col2_val:
-                    col_data_baix = st.selectbox("Coluna de Data de Pagamento", datas_baix if datas_baix else df_baix.columns)
-
-    # --- TRATAMENTO ---
-
-    import difflib
-    fornecedores_tit = df_tit['Fornecedor'].dropna().unique().tolist()
-
-    def extrair_forn_similar(texto):
-        try:
-            melhores = difflib.get_close_matches(str(texto), fornecedores_tit, n=1, cutoff=0.4)
-            return melhores[0] if melhores else None
-        except:
-            return None
-
-    if usar_extracao_baix and campo_combinado_baix:
-        df_baix['Fornecedor'] = df_baix[campo_combinado_baix].apply(extrair_forn_similar)
-
-    # Conversão de datas e valores
-    
-
+    # Conversão e agrupamento
     df_tit[col_valor_tit] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
     df_baix[col_valor_baix] = pd.to_numeric(df_baix[col_valor_baix], errors='coerce')
-
-    # Garantir colunas para o agrupamento
     df_baix['Documento'] = df_baix['Documento'].astype(str)
-    df_baix['Fornecedor'] = df_baix['Fornecedor'].astype(str)
-
-    # Agrupando pagamentos
-    pagamentos_agrupados = df_baix.groupby(['Documento', 'Fornecedor']).agg({
-        col_valor_baix: 'sum'
-    }).reset_index().rename(columns={col_valor_baix: 'Valor Pago'})
-
-    # Padronizar tipos para merge
     df_tit['Documento'] = df_tit['Documento'].astype(str)
-    df_tit['Fornecedor'] = df_tit['Fornecedor'].astype(str)
-    pagamentos_agrupados['Documento'] = pagamentos_agrupados['Documento'].astype(str)
-    pagamentos_agrupados['Fornecedor'] = pagamentos_agrupados['Fornecedor'].astype(str)
 
-    # Merge títulos com pagamentos
-    df_conc = pd.merge(df_tit, pagamentos_agrupados, on=['Documento', 'Fornecedor'], how='left')
-    df_conc_raw = df_conc.copy()
+    pagamentos = df_baix.groupby('Documento').agg({col_valor_baix: 'sum'}).reset_index().rename(columns={col_valor_baix: 'Valor Pago'})
+    df_conc = pd.merge(df_tit, pagamentos, on='Documento', how='left')
     df_conc['Valor Pago'] = df_conc['Valor Pago'].fillna(0)
     df_conc['Diferença'] = df_conc[col_valor_tit] - df_conc['Valor Pago']
-    df_conc['Status Conciliação'] = df_conc['Diferença'].apply(lambda x: 'Liquidado' if abs(x) < 0.01 else 'Pendente')
+    df_conc['Status'] = df_conc['Diferença'].apply(lambda x: 'Liquidado' if abs(x) < 0.01 else 'Pendente')
 
-    # Formatação final
-    df_conc[col_valor_tit] = df_conc[col_valor_tit].map("R$ {:,.2f}".format)
-    df_conc['Valor Pago'] = df_conc['Valor Pago'].map("R$ {:,.2f}".format)
-    df_conc['Diferença'] = df_conc['Diferença'].map("R$ {:,.2f}".format)
-
-    # Exibição final
+    # Resultado
     if st.button("🔄 Processar Conciliação"):
-        with st.spinner("Calculando conciliação..."):
-            linhas = []
-            for _, row in df_conc.iterrows():
-                base = row[['Documento', 'Fornecedor', col_data_emissao, col_data_venc]].tolist()
-                valor = df_conc_raw.loc[row.name, col_valor_tit]
-                pagamentos = df_baix[(df_baix['Documento'] == row['Documento']) & (df_baix['Fornecedor'] == row['Fornecedor'])]
+        df_conc['Valor Título'] = df_conc[col_valor_tit].map("R$ {:,.2f}".format)
+        df_conc['Valor Pago'] = df_conc['Valor Pago'].map("R$ {:,.2f}".format)
+        df_conc['Diferença'] = df_conc['Diferença'].map("R$ {:,.2f}".format)
 
-                if pagamentos.empty:
-                    linhas.append(base + [None, valor, 0, valor, 'Pendente', '—'])
-                else:
-                    total_pago = 0
-                    for i, pag in pagamentos.iterrows():
-                        if i == pagamentos.index[0]:
-                            valor_pago = pag[col_valor_baix]
-                            total_pago += valor_pago
-                            diff = valor - total_pago
-                            status = 'Liquidado' if abs(diff) < 0.01 else 'Pendente'
-                            linhas.append(base + [pag[col_data_baix], valor, valor_pago, diff, status, '—'])
-                        else:
-                            linhas.append(base + [pag[col_data_baix], None, pag[col_valor_baix], None, None, '—'])
+        st.dataframe(df_conc[['Documento', 'Fornecedor', col_venc, 'Valor Título', 'Valor Pago', 'Diferença', 'Status']], use_container_width=True)
 
-            colunas_final = ['Documento', 'Fornecedor', 'Data Emissão', 'Vencimento', 'Pagamento', 'Valor Título', 'Valor Pago', 'Diferença', 'Status Conciliação', 'Observações']
-            df_final = pd.DataFrame(linhas, columns=colunas_final)
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df_conc.to_excel(writer, index=False, sheet_name="Conciliação")
 
-            df_final['Valor Título'] = df_final['Valor Título'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
-            df_final['Valor Pago'] = df_final['Valor Pago'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
-            df_final['Diferença'] = df_final['Diferença'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
-
-            st.markdown("## Resultado da Conciliação")
-            st.dataframe(df_final)
-
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                df_final.to_excel(writer, index=False, sheet_name="Conciliação")
-            st.download_button("📥 Baixar Excel", data=output.getvalue(), file_name="conciliacao.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("📥 Baixar Excel", data=output.getvalue(), file_name="conciliacao.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
