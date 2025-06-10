@@ -22,7 +22,12 @@ st.title("🔍 Conciliador de Fornecedores")
 st.header("1. Fonte de Dados")
 usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
 
-arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"])
+col1, col2 = st.columns(2)
+with col1:
+    arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
+with col2:
+    if not usar_arquivo_unico:
+        arquivo_extra = st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"], key="extra")
 arquivo_extra = None
 if not usar_arquivo_unico:
     arquivo_extra = st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"])
