@@ -16,13 +16,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <style>
-        * { font-size: 11px !important; }
-        .stSelectbox > div, .stTextInput > div, .stDataFrame * { font-size: 11px !important; }
-    </style>
-""", unsafe_allow_html=True)
-
 # Upload de arquivos
 with st.expander("1. Fonte de Dados", expanded=True):
     usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
@@ -37,8 +30,6 @@ with st.expander("1. Fonte de Dados", expanded=True):
             arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
 
 # Função para ler abas
-#@st.cache_data
-
 def ler_abas(arquivo):
     if arquivo:
         xls = pd.ExcelFile(arquivo)
@@ -57,9 +48,9 @@ def extrair_info(texto):
     forn = re.search(regex_cli, str(texto))
     return pd.Series([doc.group(1) if doc else None, forn.group(1).strip() if forn else None])
 
-# Processamento se arquivos carregados
+# Seleção de campos referenciais e pré-visualização
 if xls_base:
-    with st.expander("2. Seleção de Abas e Conciliação", expanded=True):
+    with st.expander("2. Seleção de Abas e Campos Referenciais", expanded=True):
         col1, col2 = st.columns(2)
 
         with col1:
@@ -69,6 +60,10 @@ if xls_base:
             df_tit[['Documento', 'Fornecedor']] = df_tit[campo_tit].apply(extrair_info)
             col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
             col_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
+            col_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
+            col_centro_custo = st.selectbox("Coluna de Centro de Custo", df_tit.columns)
+            col_filial = st.selectbox("Coluna de Filial", df_tit.columns)
+            st.dataframe(df_tit.head(), use_container_width=True)
 
         with col2:
             if usar_arquivo_unico:
@@ -82,29 +77,10 @@ if xls_base:
             df_baix[['Documento', 'Fornecedor']] = df_baix[campo_baix].apply(extrair_info)
             col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
             col_data_pag = st.selectbox("Coluna de Data Pagamento", df_baix.columns)
+            st.dataframe(df_baix.head(), use_container_width=True)
 
-    # Conversão e agrupamento
-    df_tit[col_valor_tit] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
-    df_baix[col_valor_baix] = pd.to_numeric(df_baix[col_valor_baix], errors='coerce')
-    df_baix['Documento'] = df_baix['Documento'].astype(str)
-    df_tit['Documento'] = df_tit['Documento'].astype(str)
-
-    pagamentos = df_baix.groupby('Documento').agg({col_valor_baix: 'sum'}).reset_index().rename(columns={col_valor_baix: 'Valor Pago'})
-    df_conc = pd.merge(df_tit, pagamentos, on='Documento', how='left')
-    df_conc['Valor Pago'] = df_conc['Valor Pago'].fillna(0)
-    df_conc['Diferença'] = df_conc[col_valor_tit] - df_conc['Valor Pago']
-    df_conc['Status'] = df_conc['Diferença'].apply(lambda x: 'Liquidado' if abs(x) < 0.01 else 'Pendente')
-
-    # Resultado
-    if st.button("🔄 Processar Conciliação"):
-        df_conc['Valor Título'] = df_conc[col_valor_tit].map("R$ {:,.2f}".format)
-        df_conc['Valor Pago'] = df_conc['Valor Pago'].map("R$ {:,.2f}".format)
-        df_conc['Diferença'] = df_conc['Diferença'].map("R$ {:,.2f}".format)
-
-        st.dataframe(df_conc[['Documento', 'Fornecedor', col_venc, 'Valor Título', 'Valor Pago', 'Diferença', 'Status']], use_container_width=True)
-
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df_conc.to_excel(writer, index=False, sheet_name="Conciliação")
-
-        st.download_button("📥 Baixar Excel", data=output.getvalue(), file_name="conciliacao.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+# Sugestões de melhoria:
+# - Implementar lógica para identificação e tratamento de valores próximos, permitindo pequena variação na conciliação (e.g., tolerância percentual).
+# - Adicionar opção para selecionar múltiplas colunas referenciais para agrupamento adicional, se necessário.
+# - Integrar indicadores resumo após conciliação (percentual liquidado, pendências totais, etc.).
+# - Avaliar uso de fuzzy matching para nomes de fornecedores caso haja necessidade posterior.
