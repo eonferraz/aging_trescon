@@ -4,6 +4,7 @@ import io
 import re
 
 st.set_page_config(page_title="Aging", layout="wide")
+
 #------------------------------------------------------------------------------------------------------------------------------------------------------
 # Logo + título lado a lado
 st.markdown(
@@ -17,7 +18,17 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.title("🔍 Conciliador de Fornecedores")
+
+st.markdown("""
+    <style>
+        * {
+            font-size: 11px !important;
+        }
+        .stSelectbox > div, .stTextInput > div, .stDataFrame * {
+            font-size: 11px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- ARQUIVOS ---
 st.header("1. Fonte de Dados")
@@ -31,7 +42,7 @@ else:
     with col1:
         arquivo_base = st.file_uploader("Arquivo de Títulos", type=["xlsx"], key="base")
     with col2:
-        arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"], key="extra")
+        arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
 
 def ler_abas(arquivo):
     if arquivo:
