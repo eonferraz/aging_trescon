@@ -120,11 +120,11 @@ if xls_base:
 				col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
 				df_baix['Fornecedor'] = df_baix[col_forn_baix]
 		
-			col1_val, col2_val = st.columns(2)
-			with col1_val:
-			col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
-			with col2_val:
-			col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
+            col1_val, col2_val = st.columns(2)
+            with col1_val:
+            col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
+            with col2_val:
+            col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
 
 
     # --- TRATAMENTO ---
