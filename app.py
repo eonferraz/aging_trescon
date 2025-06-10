@@ -185,6 +185,7 @@ if xls_base:
 
     # Merge títulos com pagamentos
     df_conc = pd.merge(df_tit, pagamentos_agrupados, on=['Documento', 'Fornecedor'], how='left')
+    df_conc_raw = df_conc.copy()
     df_conc['Valor Pago'] = df_conc['Valor Pago'].fillna(0)
     df_conc['Diferença'] = df_conc[col_valor_tit] - df_conc['Valor Pago']
     df_conc['Status Conciliação'] = df_conc['Diferença'].apply(lambda x: 'Liquidado' if abs(x) < 0.01 else 'Pendente')
@@ -200,7 +201,7 @@ if xls_base:
             linhas = []
             for _, row in df_conc.iterrows():
                 base = row[['Documento', 'Fornecedor', col_data_emissao, col_data_venc]].tolist()
-                valor = row[col_valor_tit]
+                valor = df_conc_raw.loc[row.name, col_valor_tit]
                 pagamentos = df_baix[(df_baix['Documento'] == row['Documento']) & (df_baix['Fornecedor'] == row['Fornecedor'])]
 
                 if pagamentos.empty:
