@@ -115,7 +115,11 @@ if xls_base:
     df_tit[col_valor_tit] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
     df_baix[col_valor_baix] = pd.to_numeric(df_baix[col_valor_baix], errors='coerce')
 
-    # Agrupando pagamentos
+    # Garantir colunas para o agrupamento
+df_baix['Documento'] = df_baix[col_doc_baix]
+df_baix['Fornecedor'] = df_baix[col_forn_baix]
+
+# Agrupando pagamentos
     pagamentos_agrupados = df_baix.groupby(['Documento', 'Fornecedor']).agg({
         col_valor_baix: 'sum'
     }).reset_index().rename(columns={col_valor_baix: 'Valor Pago'})
