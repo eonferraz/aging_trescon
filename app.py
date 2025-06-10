@@ -17,35 +17,21 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-
-
-st.markdown("""
-    <style>
-        * {
-            font-size: 11px !important;
-        }
-        .stSelectbox > div, .stTextInput > div, .stDataFrame * {
-            font-size: 11px !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 st.title("🔍 Conciliador de Fornecedores")
 
 # --- ARQUIVOS ---
 st.header("1. Fonte de Dados")
 usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
 
-col1, col2 = st.columns(2)
-with col1:
+if usar_arquivo_unico:
     arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
-with col2:
-    if not usar_arquivo_unico:
-        arquivo_extra = st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"], key="extra")
-arquivo_extra = None
-if not usar_arquivo_unico:
-    arquivo_extra = st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"])
+    arquivo_extra = None
+else:
+    col1, col2 = st.columns(2)
+    with col1:
+        arquivo_base = st.file_uploader("Arquivo de Títulos", type=["xlsx"], key="base")
+    with col2:
+        arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"], key="extra")
 
 def ler_abas(arquivo):
     if arquivo:
