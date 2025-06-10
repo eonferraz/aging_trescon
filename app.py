@@ -60,6 +60,7 @@ if xls_base:
             st.markdown("### Títulos")
             aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
             df_tit = xls_base.parse(aba_titulos)
+            df_tit = df_tit.apply(pd.to_numeric, errors='ignore')
             st.dataframe(df_tit.head())
 
         with col2:
