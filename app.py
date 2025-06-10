@@ -90,14 +90,20 @@ if xls_base:
                         return pd.Series([None, None])
                 df_tit[['Documento', 'Fornecedor']] = df_tit[campo_combinado].apply(extrair_info)
             else:
-                col_doc_tit = st.selectbox("Coluna de Documento - Títulos", df_tit.columns)
-                col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
-                df_tit['Documento'] = df_tit[col_doc_tit]
-                df_tit['Fornecedor'] = df_tit[col_forn_tit]
+                col1_tit, col2_tit = st.columns(2)
+                with col1_tit:
+                    col_doc_tit = st.selectbox("Coluna de Documento - Títulos", df_tit.columns)
+                    df_tit['Documento'] = df_tit[col_doc_tit]
+                with col2_tit:
+                    col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
+                    df_tit['Fornecedor'] = df_tit[col_forn_tit]
 
-            col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
-            col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
-            col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
+            col1_valtit, col2_valtit = st.columns(2)
+            with col1_valtit:
+                col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
+                col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
+            with col2_valtit:
+                col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
 
         with col2:
             usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
