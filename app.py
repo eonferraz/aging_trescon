@@ -124,6 +124,12 @@ if xls_base:
         col_valor_baix: 'sum'
     }).reset_index().rename(columns={col_valor_baix: 'Valor Pago'})
 
+    # Padronizar tipos para merge
+    df_tit['Documento'] = df_tit['Documento'].astype(str)
+    df_tit['Fornecedor'] = df_tit['Fornecedor'].astype(str)
+    pagamentos_agrupados['Documento'] = pagamentos_agrupados['Documento'].astype(str)
+    pagamentos_agrupados['Fornecedor'] = pagamentos_agrupados['Fornecedor'].astype(str)
+
     # Merge títulos com pagamentos
     df_conc = pd.merge(df_tit, pagamentos_agrupados, on=['Documento', 'Fornecedor'], how='left')
     df_conc['Valor Pago'] = df_conc['Valor Pago'].fillna(0)
