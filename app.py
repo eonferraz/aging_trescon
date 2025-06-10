@@ -56,13 +56,13 @@ abas_extra, xls_extra = ler_abas(arquivo_extra)
 if xls_base:
     with st.expander("2. Seleção de Abas e Pré-visualização", expanded=True):
         col1, col2 = st.columns(2)
-    with col1:
+        with col1:
         st.markdown("### Títulos")
         aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
         df_tit = xls_base.parse(aba_titulos)
         st.dataframe(df_tit.head())
     with col2:
-        st.markdown("### Baixas")
+            st.markdown("### Baixas")
         if usar_arquivo_unico:
             abas_opcoes = [a for a in abas_base if a != aba_titulos]
             aba_baixas = st.selectbox("Aba com Baixas", abas_opcoes, key="aba_baixas")
@@ -75,8 +75,8 @@ if xls_base:
             st.stop()
         st.dataframe(df_baix.head())
 
-    col1, col2 = st.columns(2)
-    with col1:
+            col1, col2 = st.columns(2)
+        with col1:
         usar_extracao = st.checkbox("Extrair Documento e Fornecedor de campo combinado?", key="extrair_tit")
         if usar_extracao:
             campo_combinado = st.selectbox("Campo combinado (Títulos)", df_tit.columns)
@@ -96,8 +96,8 @@ if xls_base:
         col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
         col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
         col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
-    with col2:
-        col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
+            with col2:
+            col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
         col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
         col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
         col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
