@@ -25,79 +25,74 @@ abas_base, xls_base = ler_abas(arquivo_base)
 abas_extra, xls_extra = ler_abas(arquivo_extra)
 
 if xls_base:
-    aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
-    df_tit = xls_base.parse(aba_titulos)
-
-    if usar_arquivo_unico:
-        aba_baixas = st.selectbox("Aba com Baixas", [a for a in abas_base if a != aba_titulos], key="aba_baixas")
-        df_baix = xls_base.parse(aba_baixas)
-    elif xls_extra:
-        aba_baixas = st.selectbox("Aba com Baixas", abas_extra, key="aba_baixas")
-        df_baix = xls_extra.parse(aba_baixas)
-    else:
-        st.warning("Por favor, selecione ou carregue o arquivo de baixas.")
-        st.stop()
-
-    # --- VISUALIZAÇÃO LADO A LADO ---
-    st.subheader("Prévia dos Dados")
     col1, col2 = st.columns(2)
     with col1:
-        st.write("**Títulos:**")
-        st.dataframe(df_tit.head())
+        aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
+        df_tit = xls_base.parse(aba_titulos)
     with col2:
-        st.write("**Baixas:**")
+        if usar_arquivo_unico:
+            abas_opcoes = [a for a in abas_base if a != aba_titulos]
+            aba_baixas = st.selectbox("Aba com Baixas", abas_opcoes, key="aba_baixas")
+            df_baix = xls_base.parse(aba_baixas)
+        elif xls_extra:
+            aba_baixas = st.selectbox("Aba com Baixas", abas_extra, key="aba_baixas")
+            df_baix = xls_extra.parse(aba_baixas)
+        else:
+            st.warning("Por favor, selecione ou carregue o arquivo de baixas.")
+            st.stop()
+
+    # --- VISUALIZAÇÃO E MAPEAMENTO ---
+    st.subheader("2. Pré-visualização e Mapeamento")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### Títulos")
+        st.dataframe(df_tit.head())
+        usar_extracao = st.checkbox("Extrair Documento e Fornecedor de campo combinado?", key="extrair_tit")
+        if usar_extracao:
+            campo_combinado = st.selectbox("Campo combinado (Títulos)", df_tit.columns)
+            def extrair_info(texto):
+                try:
+                    doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
+                    forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
+                    return pd.Series([doc, forn])
+                except:
+                    return pd.Series([None, None])
+            df_tit[['Documento', 'Fornecedor']] = df_tit[campo_combinado].apply(extrair_info)
+        else:
+            col_doc_tit = st.selectbox("Coluna de Documento - Títulos", df_tit.columns)
+            col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
+            df_tit['Documento'] = df_tit[col_doc_tit]
+            df_tit['Fornecedor'] = df_tit[col_forn_tit]
+        col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
+        col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
+        col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
+    with col2:
+        st.markdown("### Baixas")
         st.dataframe(df_baix.head())
+        col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
+        col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
+        col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
+        col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
 
-    # --- EXTRAÇÃO INTELIGENTE ---
-    st.header("2. Extração de Documento e Fornecedor")
-    usar_extracao = st.checkbox("Extrair dados de campo combinado?")
+    # --- TRATAMENTO ---
+    df_tit['Documento'] = df_tit['Documento'].astype(str).str.strip()
+    df_tit['Fornecedor'] = df_tit['Fornecedor'].astype(str).str.strip()
+    df_tit['Valor Título'] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
+    df_tit['Data Emissão'] = pd.to_datetime(df_tit[col_data_emissao], errors='coerce').dt.strftime('%d/%m/%Y')
+    df_tit['Vencimento'] = pd.to_datetime(df_tit[col_data_venc], errors='coerce').dt.strftime('%d/%m/%Y')
 
-    if usar_extracao:
-        campo_combinado = st.selectbox("Selecione o campo combinado", df_tit.columns)
-
-        def extrair_info(texto):
-            try:
-                doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
-                forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
-                return pd.Series([doc, forn])
-            except:
-                return pd.Series([None, None])
-
-        df_tit[['Documento', 'Fornecedor']] = df_tit[campo_combinado].apply(extrair_info)
-    else:
-        col_doc_tit = st.selectbox("Coluna de Documento - Títulos", df_tit.columns)
-        col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", df_tit.columns)
-        df_tit['Documento'] = df_tit[col_doc_tit]
-        df_tit['Fornecedor'] = df_tit[col_forn_tit]
-
-    col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
-    col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
-    col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
-    col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
-
-    df_baix['Documento'] = df_baix[col_doc_baix]
-    df_baix['Fornecedor'] = df_baix[col_forn_baix]
+    df_baix['Documento'] = df_baix[col_doc_baix].astype(str).str.strip()
+    df_baix['Fornecedor'] = df_baix[col_forn_baix].astype(str).str.strip()
     df_baix['Valor Pago'] = pd.to_numeric(df_baix[col_valor_baix], errors='coerce')
-    df_baix['Data Pagamento'] = pd.to_datetime(df_baix[col_data_baix], errors='coerce')
+    df_baix['Valor Pago Formatado'] = df_baix['Valor Pago'].map(lambda x: f"R$ {x:,.2f}".replace(',', 'v').replace('.', ',').replace('v', '.'))
+    df_baix['Data Pagamento'] = pd.to_datetime(df_baix[col_data_baix], errors='coerce').dt.strftime('%d/%m/%Y')
 
     # --- CONCILIAÇÃO ---
     st.header("3. Conciliação")
-    col_valor_tit = st.selectbox("Coluna de Valor do Título", df_tit.columns)
-    col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
-    col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
-
-    df_tit['Valor Título'] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
-    df_tit['Data Emissão'] = pd.to_datetime(df_tit[col_data_emissao], errors='coerce')
-    df_tit['Vencimento'] = pd.to_datetime(df_tit[col_data_venc], errors='coerce')
-
     pagamentos_agrupados = df_baix.groupby(['Documento', 'Fornecedor']).agg({
         'Valor Pago': 'sum'
     }).reset_index()
 
-
-    # Forçar tipos iguais para merge
-    df_tit['Documento'] = df_tit['Documento'].astype(str).str.strip()
-    df_tit['Fornecedor'] = df_tit['Fornecedor'].astype(str).str.strip()
     pagamentos_agrupados['Documento'] = pagamentos_agrupados['Documento'].astype(str).str.strip()
     pagamentos_agrupados['Fornecedor'] = pagamentos_agrupados['Fornecedor'].astype(str).str.strip()
 
@@ -116,6 +111,9 @@ if xls_base:
             return 'Parcialmente Pago'
 
     df_conc['Status'] = df_conc.apply(classificar, axis=1)
+    df_conc['Valor Título'] = df_conc['Valor Título'].map(lambda x: f"R$ {x:,.2f}".replace(',', 'v').replace('.', ',').replace('v', '.'))
+    df_conc['Valor Pago'] = df_conc['Valor Pago'].map(lambda x: f"R$ {x:,.2f}".replace(',', 'v').replace('.', ',').replace('v', '.'))
+    df_conc['Diferença'] = df_conc['Diferença'].map(lambda x: f"R$ {x:,.2f}".replace(',', 'v').replace('.', ',').replace('v', '.'))
 
     # --- OUTPUT PRINCIPAL ---
     st.subheader("Resultado da Conciliação")
