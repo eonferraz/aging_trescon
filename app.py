@@ -34,15 +34,15 @@ st.markdown("""
 with st.expander("1. Fonte de Dados", expanded=True):
     usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
 
-if usar_arquivo_unico:
-    arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
-    arquivo_extra = None
-else:
-    col1, col2 = st.columns(2)
-    with col1:
-        arquivo_base = st.file_uploader("Arquivo de Títulos", type=["xlsx"], key="base")
-    with col2:
-        arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
+    if usar_arquivo_unico:
+        arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"], key="base")
+        arquivo_extra = None
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            arquivo_base = st.file_uploader("Arquivo de Títulos", type=["xlsx"], key="base")
+        with col2:
+            arquivo_extra = st.file_uploader("Arquivo de Baixas", type=["xlsx"], key="extra")
 
 def ler_abas(arquivo):
     if arquivo:
