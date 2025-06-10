@@ -60,7 +60,7 @@ if xls_base:
             st.markdown("### Títulos")
             aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
             df_tit = xls_base.parse(aba_titulos)
-            df_tit = df_tit.apply(pd.to_numeric, errors='ignore')
+            
             st.dataframe(df_tit.head())
 
         with col2:
@@ -103,7 +103,7 @@ if xls_base:
                     col_forn_tit = st.selectbox("Coluna de Fornecedor - Títulos", colunas_tit, index=colunas_tit.index(sugestao_forn_tit))
                     df_tit['Fornecedor'] = df_tit[col_forn_tit]
 
-                valores_tit = df_tit.select_dtypes(include='number').columns.tolist()
+                valores_tit = df_tit.columns.tolist()
                 datas_tit = df_tit.columns[df_tit.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
 
                 col1_valtit, col2_valtit = st.columns(2)
@@ -138,7 +138,7 @@ if xls_base:
                     col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", colunas_baix, index=colunas_baix.index(sugestao_forn_baix))
                     df_baix['Fornecedor'] = df_baix[col_forn_baix]
 
-                valores_baix = df_baix.select_dtypes(include='number').columns.tolist()
+                valores_baix = df_baix.columns.tolist()
                 datas_baix = df_baix.columns[df_baix.apply(lambda col: col.astype(str).str.contains(r'\d{2}/\d{2}/\d{4}').any())].tolist()
 
                 col1_val, col2_val = st.columns(2)
@@ -150,9 +150,7 @@ if xls_base:
     # --- TRATAMENTO ---
 
     # Conversão de datas e valores
-    df_tit[col_data_emissao] = pd.to_datetime(df_tit[col_data_emissao], errors='coerce').dt.strftime('%d/%m/%Y')
-    df_tit[col_data_venc] = pd.to_datetime(df_tit[col_data_venc], errors='coerce').dt.strftime('%d/%m/%Y')
-    df_baix[col_data_baix] = pd.to_datetime(df_baix[col_data_baix], errors='coerce').dt.strftime('%d/%m/%Y')
+    
 
     df_tit[col_valor_tit] = pd.to_numeric(df_tit[col_valor_tit], errors='coerce')
     df_baix[col_valor_baix] = pd.to_numeric(df_baix[col_valor_baix], errors='coerce')
