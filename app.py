@@ -195,5 +195,39 @@ if xls_base:
     df_conc['Diferença'] = df_conc['Diferença'].map("R$ {:,.2f}".format)
 
     # Exibição final
-    st.markdown("## Resultado da Conciliação")
-    st.dataframe(df_conc)
+    if st.button("🔄 Processar Conciliação"):
+        with st.spinner("Calculando conciliação..."):
+            linhas = []
+            for _, row in df_conc.iterrows():
+                base = row[['Documento', 'Fornecedor', col_data_emissao, col_data_venc]].tolist()
+                valor = row[col_valor_tit]
+                pagamentos = df_baix[(df_baix['Documento'] == row['Documento']) & (df_baix['Fornecedor'] == row['Fornecedor'])]
+
+                if pagamentos.empty:
+                    linhas.append(base + [None, valor, 0, valor, 'Pendente', '—'])
+                else:
+                    total_pago = 0
+                    for i, pag in pagamentos.iterrows():
+                        if i == pagamentos.index[0]:
+                            valor_pago = pag[col_valor_baix]
+                            total_pago += valor_pago
+                            diff = valor - total_pago
+                            status = 'Liquidado' if abs(diff) < 0.01 else 'Pendente'
+                            linhas.append(base + [pag[col_data_baix], valor, valor_pago, diff, status, '—'])
+                        else:
+                            linhas.append(base + [pag[col_data_baix], None, pag[col_valor_baix], None, None, '—'])
+
+            colunas_final = ['Documento', 'Fornecedor', 'Data Emissão', 'Vencimento', 'Pagamento', 'Valor Título', 'Valor Pago', 'Diferença', 'Status Conciliação', 'Observações']
+            df_final = pd.DataFrame(linhas, columns=colunas_final)
+
+            df_final['Valor Título'] = df_final['Valor Título'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
+            df_final['Valor Pago'] = df_final['Valor Pago'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
+            df_final['Diferença'] = df_final['Diferença'].apply(lambda x: f"R$ {x:,.2f}" if pd.notnull(x) else '')
+
+            st.markdown("## Resultado da Conciliação")
+            st.dataframe(df_final)
+
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                df_final.to_excel(writer, index=False, sheet_name="Conciliação")
+            st.download_button("📥 Baixar Excel", data=output.getvalue(), file_name="conciliacao.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
