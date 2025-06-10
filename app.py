@@ -99,32 +99,32 @@ if xls_base:
             col_data_emissao = st.selectbox("Coluna de Emissão", df_tit.columns)
             col_data_venc = st.selectbox("Coluna de Vencimento", df_tit.columns)
 		
-		with col2:
-			usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
-			if usar_extracao_baix:
-			campo_combinado_baix = st.selectbox("Campo combinado (Baixas)", df_baix.columns)
-			def extrair_info_baixa(texto):
-				try:
-				doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
-				forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
-				return pd.Series([doc, forn])
-				except:
-				return pd.Series([None, None])
-			df_baix[['Documento', 'Fornecedor']] = df_baix[campo_combinado_baix].apply(extrair_info_baixa)
-			else:
-			col1_baix, col2_baix = st.columns(2)
-			with col1_baix:
-				col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
-				df_baix['Documento'] = df_baix[col_doc_baix]
-			with col2_baix:
-				col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
-				df_baix['Fornecedor'] = df_baix[col_forn_baix]
+	with col2:
+		usar_extracao_baix = st.checkbox("Extrair Documento e Fornecedor de campo combinado? (Baixas)", key="extrair_baix")
+		if usar_extracao_baix:
+		campo_combinado_baix = st.selectbox("Campo combinado (Baixas)", df_baix.columns)
+		def extrair_info_baixa(texto):
+			try:
+			doc = re.search(r'NF[:\s]*(\d+)', str(texto)).group(1)
+			forn = re.search(r'CLIENTE[:\s]*(.*)', str(texto)).group(1)
+			return pd.Series([doc, forn])
+			except:
+			return pd.Series([None, None])
+		df_baix[['Documento', 'Fornecedor']] = df_baix[campo_combinado_baix].apply(extrair_info_baixa)
+		else:
+		col1_baix, col2_baix = st.columns(2)
+		with col1_baix:
+			col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
+			df_baix['Documento'] = df_baix[col_doc_baix]
+		with col2_baix:
+			col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
+			df_baix['Fornecedor'] = df_baix[col_forn_baix]
 		
-            col1_val, col2_val = st.columns(2)
-            with col1_val:
-            col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
-            with col2_val:
-            col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
+		col1_val, col2_val = st.columns(2)
+		with col1_val:
+		col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
+		with col2_val:
+		col_data_baix = st.selectbox("Coluna de Data de Pagamento", df_baix.columns)
 
 
     # --- TRATAMENTO ---
