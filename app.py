@@ -6,28 +6,49 @@ import re
 st.set_page_config(page_title="Conciliador de Fornecedores", layout="wide")
 st.title("🔍 Conciliador de Fornecedores")
 
-# --- UPLOAD ---
-st.header("1. Upload dos Arquivos")
-arquivo_titulos = st.file_uploader("Arquivo de Títulos (Contas a Pagar)", type=["csv", "xlsx"], key="titulos")
-arquivo_baixas = st.file_uploader("Arquivo de Baixas (Pagamentos)", type=["csv", "xlsx"], key="baixas")
+# --- ARQUIVOS ---
+st.header("1. Fonte de Dados")
+usar_arquivo_unico = st.checkbox("Usar o mesmo arquivo para Títulos e Baixas")
 
-def ler_arquivo(arquivo):
-    if arquivo.name.endswith(".csv"):
-        return pd.read_csv(arquivo)
+arquivo_base = st.file_uploader("Arquivo Base (com uma ou mais abas)", type=["xlsx"])
+arquivo_extra = None
+if not usar_arquivo_unico:
+    arquivo_extra = st.file_uploader("Arquivo Secundário (caso abas estejam em arquivos separados)", type=["xlsx"])
+
+def ler_abas(arquivo):
+    if arquivo:
+        xls = pd.ExcelFile(arquivo)
+        return xls.sheet_names, xls
+    return [], None
+
+abas_base, xls_base = ler_abas(arquivo_base)
+abas_extra, xls_extra = ler_abas(arquivo_extra)
+
+if xls_base:
+    aba_titulos = st.selectbox("Aba com Títulos", abas_base, key="aba_titulos")
+    df_tit = xls_base.parse(aba_titulos)
+
+    if usar_arquivo_unico:
+        aba_baixas = st.selectbox("Aba com Baixas", [a for a in abas_base if a != aba_titulos], key="aba_baixas")
+        df_baix = xls_base.parse(aba_baixas)
+    elif xls_extra:
+        aba_baixas = st.selectbox("Aba com Baixas", abas_extra, key="aba_baixas")
+        df_baix = xls_extra.parse(aba_baixas)
     else:
-        return pd.read_excel(arquivo)
+        st.warning("Por favor, selecione ou carregue o arquivo de baixas.")
+        st.stop()
 
-if arquivo_titulos and arquivo_baixas:
-    df_tit = ler_arquivo(arquivo_titulos)
-    df_baix = ler_arquivo(arquivo_baixas)
-
+    # --- VISUALIZAÇÃO LADO A LADO ---
     st.subheader("Prévia dos Dados")
-    st.write("**Títulos:**")
-    st.dataframe(df_tit.head())
-    st.write("**Baixas:**")
-    st.dataframe(df_baix.head())
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Títulos:**")
+        st.dataframe(df_tit.head())
+    with col2:
+        st.write("**Baixas:**")
+        st.dataframe(df_baix.head())
 
-    # --- OPÇÃO DE EXTRAÇÃO INTELIGENTE ---
+    # --- EXTRAÇÃO INTELIGENTE ---
     st.header("2. Extração de Documento e Fornecedor")
     usar_extracao = st.checkbox("Extrair dados de campo combinado?")
 
@@ -49,7 +70,6 @@ if arquivo_titulos and arquivo_baixas:
         df_tit['Documento'] = df_tit[col_doc_tit]
         df_tit['Fornecedor'] = df_tit[col_forn_tit]
 
-    # Mapeamento das colunas de baixas
     col_doc_baix = st.selectbox("Coluna de Documento - Baixas", df_baix.columns)
     col_forn_baix = st.selectbox("Coluna de Fornecedor - Baixas", df_baix.columns)
     col_valor_baix = st.selectbox("Coluna de Valor Pago", df_baix.columns)
