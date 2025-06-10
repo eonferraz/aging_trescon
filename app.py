@@ -4,6 +4,18 @@ import io
 import re
 
 st.set_page_config(page_title="Conciliador de Fornecedores", layout="wide")
+
+st.markdown("""
+    <style>
+        * {
+            font-size: 11px !important;
+        }
+        .stSelectbox > div, .stTextInput > div, .stDataFrame * {
+            font-size: 11px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🔍 Conciliador de Fornecedores")
 
 # --- ARQUIVOS ---
