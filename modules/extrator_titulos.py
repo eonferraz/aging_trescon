@@ -78,15 +78,22 @@ def executar(df):
     # Aplicação de extrações ou cópias diretas
     st.markdown("---")
     df_resultado = pd.DataFrame()
-    
+
+    #Ref
     for campo, coluna in campos_mapeados.items():
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
             extraido = aplicar_regex_em_coluna(df, coluna, regex)
-            df_resultado[campo] = extraido.fillna("")
+            if campo == "Número do Título":
+                df_resultado[campo] = extraido.fillna("").astype(str)
+            else:
+                df_resultado[campo] = extraido.fillna("")
         else:
-            df_resultado[campo] = df[coluna].fillna("")
-    
+            if campo == "Número do Título":
+                df_resultado[campo] = df[coluna].fillna("").astype(str)
+            else:
+                df_resultado[campo] = df[coluna].fillna("")
+
     # Mostra o resultado final tratado
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=True)
