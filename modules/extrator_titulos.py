@@ -81,27 +81,47 @@ def executar(df):
 
     df_resultado = df.copy()
 
+    extracoes = []  # Lista para armazenar os resultados extraídos
+
     for campo, coluna in campos_mapeados.items():
+        if coluna not in df.columns:
+            continue
+    
+        textos_originais = df[coluna].astype(str)
+    
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
-            extraido = aplicar_regex_em_coluna(df, coluna, regex)
-
-            if extraido is not None and extraido.notna().sum() > 0:
-                df_resultado[campo] = extraido
-                st.success(f"Campo '{campo}' extraído com sucesso da coluna '{coluna}'")
-                st.dataframe(
-                    pd.DataFrame({
-                        "Texto Original": df[coluna].head(5),
-                        f"{campo} Extraído": extraido.head(5)
-                    }),
-                    use_container_width=True
-                )
-            else:
-                st.warning(f"Não foi possível extrair '{campo}' da coluna '{coluna}' com a regex padrão.")
+            extraidos = aplicar_regex_em_coluna(df, coluna, regex)
+    
+            for i, (texto, valor) in enumerate(zip(textos_originais, extraidos)):
+                extracoes.append({
+                    "Linha": i + 1,
+                    "Campo": campo,
+                    "Coluna Origem": coluna,
+                    "Texto Original": texto,
+                    "Valor Extraído": valor if pd.notna(valor) else "",
+                    "Tratado com Regex": True
+                })
+    
         else:
-            df_resultado[campo] = df[coluna]
-            st.info(f"Campo '{campo}' definido diretamente da coluna '{coluna}' (sem regex).")
-            st.dataframe(df[[coluna]].head(5).rename(columns={coluna: campo}), use_container_width=True)
+            for i, texto in enumerate(textos_originais):
+                extracoes.append({
+                    "Linha": i + 1,
+                    "Campo": campo,
+                    "Coluna Origem": coluna,
+                    "Texto Original": texto,
+                    "Valor Extraído": texto,
+                    "Tratado com Regex": False
+                })
+    
+    # Cria DataFrame com todos os resultados organizados
+    df_extracoes = pd.DataFrame(extracoes)
+    st.markdown("### 📄 Resultado consolidado das extrações")
+    st.dataframe(df_extracoes, use_container_width=True)
+    
+    # Salva no session_state para exportação futura
+    st.session_state["df_extracoes"] = df_extracoes
+
 
     st.session_state["df_titulos"] = df_resultado
     st.markdown("---")
