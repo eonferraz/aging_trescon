@@ -44,10 +44,15 @@ def executar(df):
         st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
         for campo in CAMPOS_LOGICOS:
             st.markdown(f"`{campo}`")
-            sel_col, chk = st.columns([2, 1])
+            campos, sel_col, chk = st.columns([2, 2, 1])
+            
+            with campos:
+                
+            
             with sel_col:
                 coluna_selecionada = st.selectbox(
-                    f" {campo}",
+                    #f" {campo}",
+                    f"",
                     colunas,
                     key=f"sel_col_{campo}"
                 )
