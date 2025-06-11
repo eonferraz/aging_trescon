@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import re
 
-# Campos possíveis para extração
-CAMPOS_DISPONIVEIS = [
+# Campos lógicos a extrair/tratar
+CAMPOS_LOGICOS = [
     "Fornecedor",
     "Número do Título",
     "Data de Emissão",
@@ -11,7 +11,7 @@ CAMPOS_DISPONIVEIS = [
     "Valor do Título"
 ]
 
-# Regex sugerido por campo
+# Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
     "Fornecedor": r"(?i)CLIENTE[:\- ]+\s*(.+)",
     "Número do Título": r"(?i)NF[:\- ]+(\d+)",
@@ -20,77 +20,83 @@ REGEX_SUGERIDA = {
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
-
 def aplicar_regex_em_coluna(df, coluna, regex):
-    """
-    Aplica a regex na coluna selecionada e retorna os dados extraídos.
-    """
+    """Aplica regex e retorna valores extraídos"""
     try:
         return df[coluna].astype(str).str.extract(regex, expand=False)
     except Exception as e:
         st.error(f"Erro ao aplicar regex: {e}")
         return None
 
-
 def executar(df):
     """
-    Interface assistida com decisão final do usuário.
-    Analisa todas as colunas de texto, mostra sugestões de extração e permite
-    ao usuário escolher a coluna final para aplicar.
+    Interface assistida para mapeamento e tratamento de colunas do DataFrame.
+    O usuário escolhe qual coluna representa cada campo lógico e se precisa de regex.
     """
-    st.markdown("<div class='custom-subheader'>🧠 Extração Assistida de Campos</div>", unsafe_allow_html=True)
+    st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
     if df.empty or df.shape[1] == 0:
         st.warning("Nenhum dado disponível para análise. Importe os títulos primeiro.")
         return
 
-    campo = st.selectbox("Selecione o campo que deseja extrair:", CAMPOS_DISPONIVEIS)
-    regex = REGEX_SUGERIDA.get(campo, "")
-    colunas_texto = df.select_dtypes(include='object').columns.tolist()
+    st.markdown("### 🧾 Visualização dos Dados Importados")
+    st.dataframe(df.head(10), use_container_width=True)
 
-    if not colunas_texto:
-        st.warning("Não foram encontradas colunas com texto para análise.")
-        return
+    colunas = df.columns.tolist()
+    campos_mapeados = {}
+    campos_com_tratamento = {}
 
-    st.markdown("### 🔎 Análise automática das colunas disponíveis")
-    colunas_com_sucesso = []
+    st.markdown("### 🛠️ Mapeamento de Campos")
 
-    for col in colunas_texto:
-        extraido = aplicar_regex_em_coluna(df, col, regex)
+    # Loop por cada campo lógico (Fornecedor, NF, etc.)
+    for campo in CAMPOS_LOGICOS:
+        st.markdown(f"**Campo lógico:** `{campo}`")
 
-        if extraido is not None and extraido.notna().sum() > 0:
-            colunas_com_sucesso.append((col, extraido))
-            st.markdown(f"**Coluna candidata:** `{col}` — resultados encontrados:")
-            preview = pd.DataFrame({
-                "Texto Original": df[col].head(5),
-                f"{campo} Extraído": extraido.head(5)
-            })
-            st.dataframe(preview, use_container_width=True)
+        col, col2 = st.columns([2, 1])
+        with col:
+            coluna_selecionada = st.selectbox(
+                f"→ Qual coluna contém o campo '{campo}'?",
+                colunas,
+                key=f"sel_col_{campo}"
+            )
+        with col2:
+            precisa_tratar = st.checkbox("Tratar via regex?", key=f"chk_regex_{campo}", value=True)
 
-    if not colunas_com_sucesso:
-        st.info("Nenhuma correspondência foi encontrada com a expressão padrão. Tente revisar a regex.")
-        return
+        campos_mapeados[campo] = coluna_selecionada
+        campos_com_tratamento[campo] = precisa_tratar
 
-    # Seleção final da coluna pelo usuário
-    colunas_nomes = [col[0] for col in colunas_com_sucesso]
-    coluna_escolhida = st.selectbox("✅ Selecione qual coluna deseja usar para extrair o campo:", colunas_nomes)
+    # Inicializa DataFrame resultado
+    df_resultado = df.copy()
 
-    if coluna_escolhida:
-        extraido_final = dict(colunas_com_sucesso)[coluna_escolhida]
+    st.markdown("---")
+    st.markdown("### ✨ Resultados das Extrações")
 
-        st.markdown("#### 📋 Resultado Final da Extração")
-        st.dataframe(pd.DataFrame({
-            "Texto Original": df[coluna_escolhida].head(10),
-            f"{campo} Extraído": extraido_final.head(10)
-        }), use_container_width=True)
+    for campo, coluna in campos_mapeados.items():
+        if campos_com_tratamento[campo]:
+            regex = REGEX_SUGERIDA.get(campo, "")
 
-        if st.button("✔️ Aplicar Extração"):
-            df_resultado = df.copy()
-            df_resultado[campo] = extraido_final
+            extraido = aplicar_regex_em_coluna(df, coluna, regex)
 
-            # Armazenar resultado
-            chave = f"campo_extraido_{campo.lower().replace(' ', '_')}"
-            st.session_state[chave] = extraido_final
-            st.session_state["df_titulos"] = df_resultado
+            if extraido is not None and extraido.notna().sum() > 0:
+                df_resultado[campo] = extraido
+                st.success(f"Campo '{campo}' extraído com sucesso da coluna '{coluna}'")
+                st.dataframe(
+                    pd.DataFrame({
+                        "Texto Original": df[coluna].head(5),
+                        f"{campo} Extraído": extraido.head(5)
+                    }),
+                    use_container_width=True
+                )
+            else:
+                st.warning(f"Não foi possível extrair '{campo}' da coluna '{coluna}' com a regex padrão.")
+        else:
+            # Apenas copia o valor diretamente da coluna escolhida
+            df_resultado[campo] = df[coluna]
+            st.info(f"Campo '{campo}' definido diretamente da coluna '{coluna}' (sem regex).")
+            st.dataframe(df[[coluna]].head(5).rename(columns={coluna: campo}), use_container_width=True)
 
-            st.success(f"Campo '{campo}' extraído com sucesso da coluna '{coluna_escolhida}'!")
+    # Salva resultado no session_state
+    st.session_state["df_titulos"] = df_resultado
+
+    st.markdown("---")
+    st.success("✅ Mapeamento e tratamento concluídos. Dados prontos para conciliação ou exportação.")
