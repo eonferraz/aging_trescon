@@ -1,3 +1,6 @@
+import streamlit as st
+from datetime import datetime
+
 # Cabeçalho com logo e data
 st.markdown(
     """
