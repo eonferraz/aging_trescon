@@ -3,8 +3,8 @@ import pandas as pd     # Importa o pandas para leitura e manipulação de dados
 
 def executar():
     # Exibe uma mensagem informativa para orientar o usuário
-    st.info("Faça o upload do arquivo Excel com os títulos financeiros.")
-
+    st.markdown("📎 <span style='font-size:10px;'>Faça o upload do arquivo Excel com os títulos financeiros.</span>", unsafe_allow_html=True)
+    
     # Cria um componente para upload de arquivos Excel (.xlsx)
     arquivo = st.file_uploader("Selecionar arquivo Excel (.xlsx)", type=["xlsx"])
 
