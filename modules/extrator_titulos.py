@@ -2,6 +2,26 @@ import streamlit as st
 import pandas as pd
 import re
 
+# Campos lógicos a extrair/tratar
+CAMPOS_LOGICOS = [
+    "Fornecedor",
+    "Número do Título",
+    "Data de Emissão",
+    "Data de Vencimento",
+    "Valor do Título"
+]
+
+# Expressões regulares sugeridas por campo
+REGEX_SUGERIDA = {
+    "Fornecedor": r"(?i)CLIENTE[:\- ]+\s*(.+)",
+    "Número do Título": r"(?i)NF[:\- ]+(\d+)",
+    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
+}
+
+
+#Função
 def executar(df):
     st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
