@@ -7,7 +7,7 @@ from PIL import Image
 from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
-from modules import fluxo_importacao
+from modules import fluxo_extracao_titulos
 from utils.menu_etapas import exibir_menu_lateral
 
 import streamlit as st
@@ -59,7 +59,7 @@ elif st.session_state["etapa"] == "exportacao":
 # 01. Importação da planilha de títulos
 st.markdown("<div class='custom-subheader'>1️⃣ Importação dos Títulos</div>", unsafe_allow_html=True)
 
-fluxo_importacao.executar()
+fluxo_extracao_titulos.executar()
 
 
 #=======================================================================================================================================
