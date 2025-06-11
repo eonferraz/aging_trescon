@@ -24,11 +24,27 @@ exibir_cabecalho()
 
 #Chama a aplicação de CSS que está em utils
 aplicar_css()
+#=======================================================================================================================================
 
 
-# Mostra o menu lateral
+# MENU LATERAL
+#=======================================================================================================================================
+# Chama o menu lateral
 exibir_menu_lateral()
 
+# Fluxo por etapa
+if st.session_state["etapa"] == "importacao_titulos":
+    fluxo_importacao_titulos.executar()
+elif st.session_state["etapa"] == "extracao_titulos":
+    fluxo_extracao_titulos.executar()
+elif st.session_state["etapa"] == "importacao_baixas":
+    fluxo_importacao_baixas.executar()
+elif st.session_state["etapa"] == "extracao_baixas":
+    fluxo_extracao_baixas.executar()
+elif st.session_state["etapa"] == "conciliacao":
+    fluxo_conciliacao.executar()
+elif st.session_state["etapa"] == "exportacao":
+    fluxo_exportacao.executar()
 
 #=======================================================================================================================================
 
