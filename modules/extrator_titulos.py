@@ -50,7 +50,7 @@ def executar(df):
 
     # Loop por cada campo lógico (Fornecedor, NF, etc.)
     for campo in CAMPOS_LOGICOS:
-        st.markdown(f"**Campo lógico:** `{campo}`")
+        st.markdown(f"`{campo}`")
 
         col, col2 = st.columns([2, 1])
         with col:
