@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 
-# Lista de campos que o usuário pode extrair dos textos livres
+# Campos possíveis para extração
 CAMPOS_DISPONIVEIS = [
     "Fornecedor",
     "Número do Título",
@@ -11,30 +11,22 @@ CAMPOS_DISPONIVEIS = [
     "Valor do Título"
 ]
 
-# Sugestões de expressões regulares por campo (o usuário pode editar depois)
+# Regex sugerido por campo
 REGEX_SUGERIDA = {
-    "Fornecedor": r"CLIENTE[:\- ]+(.+)",
-    "Número do Título": r"NF[:\- ]+(\d+)",
-    "Data de Emissão": r"EMISSÃO[:\- ]+(\d{2}/\d{2}/\d{4})",
-    "Data de Vencimento": r"VENC[:\- ]+(\d{2}/\d{2}/\d{4})",
-    "Valor do Título": r"VALOR[:\- R$]*([\d\.,]+)"
+    "Fornecedor": r"(?i)CLIENTE[:\- ]+\s*(.+)",
+    "Número do Título": r"(?i)NF[:\- ]+(\d+)",
+    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
 
-def aplicar_regex_em_coluna(df, coluna_origem, regex):
+def aplicar_regex_em_coluna(df, coluna, regex):
     """
-    Aplica uma expressão regular em uma coluna e retorna os valores extraídos.
-
-    Args:
-        df (pd.DataFrame): DataFrame original
-        coluna_origem (str): Nome da coluna onde será aplicada a extração
-        regex (str): Expressão regular definida pelo usuário
-
-    Returns:
-        pd.Series: Série com os dados extraídos ou None caso erro
+    Aplica a regex na coluna selecionada e retorna os dados extraídos.
     """
     try:
-        return df[coluna_origem].astype(str).str.extract(regex, expand=False)
+        return df[coluna].astype(str).str.extract(regex, expand=False)
     except Exception as e:
         st.error(f"Erro ao aplicar regex: {e}")
         return None
@@ -42,51 +34,44 @@ def aplicar_regex_em_coluna(df, coluna_origem, regex):
 
 def executar(df):
     """
-    Função principal do módulo. Permite ao usuário selecionar uma coluna de texto livre,
-    escolher qual campo deseja extrair (ex: Fornecedor), definir ou ajustar a regex, 
-    e visualizar o resultado da extração com opção de correção manual.
-
-    Args:
-        df (pd.DataFrame): DataFrame original com os dados importados dos títulos
+    Interface assistida para extrair campos de colunas com texto livre.
+    O usuário escolhe o campo desejado e o sistema analisa as colunas automaticamente.
     """
-    st.markdown("<div class='custom-subheader'>🔍 Extração de Campos dos Títulos</div>", unsafe_allow_html=True)
+    st.markdown("<div class='custom-subheader'>🧠 Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
-    # Verifica se há colunas no DataFrame
     if df.empty or df.shape[1] == 0:
         st.warning("Nenhum dado disponível para análise. Importe os títulos primeiro.")
         return
 
-    # Seleção do campo que o usuário deseja extrair
-    campo = st.selectbox("Qual campo deseja extrair?", CAMPOS_DISPONIVEIS)
+    campo = st.selectbox("Selecione o campo que deseja extrair:", CAMPOS_DISPONIVEIS)
+    regex = REGEX_SUGERIDA.get(campo, "")
 
-    # Seleção da coluna onde a informação está embutida
-    coluna_origem = st.selectbox("Selecione a coluna que contém os dados misturados:", df.columns)
+    colunas_texto = df.select_dtypes(include='object').columns.tolist()
 
-    # Sugestão automática de regex baseada no campo escolhido
-    regex_default = REGEX_SUGERIDA.get(campo, "")
+    if not colunas_texto:
+        st.warning("Não foram encontradas colunas com texto para análise.")
+        return
 
-    # Permitir ao usuário ajustar a expressão regular
-    regex = st.text_input("Digite a expressão regular (regex) para extrair o valor desejado:", value=regex_default)
+    st.markdown("### 🔎 Análise automática das colunas disponíveis")
 
-    # Exibir exemplo de conteúdo da coluna selecionada
-    st.markdown("#### 🧾 Exemplos da Coluna Selecionada")
-    st.dataframe(df[[coluna_origem]].head(10), use_container_width=True)
+    for col in colunas_texto:
+        # Aplica o regex à coluna
+        extraido = aplicar_regex_em_coluna(df, col, regex)
 
-    # Botão para aplicar regex
-    if st.button("🔍 Aplicar Extração"):
-        extraido = aplicar_regex_em_coluna(df, coluna_origem, regex)
+        if extraido is not None and extraido.notna().sum() > 0:
+            st.markdown(f"**Coluna:** `{col}` — valores extraídos encontrados:")
+            preview = pd.DataFrame({
+                "Texto Original": df[col].head(5),
+                f"{campo} Extraído": extraido.head(5)
+            })
+            st.dataframe(preview, use_container_width=True)
 
-        if extraido is not None:
-            df_resultado = df.copy()
-            df_resultado[campo] = extraido
+            if st.button(f"✅ Usar coluna '{col}' para '{campo}'"):
+                df_resultado = df.copy()
+                df_resultado[campo] = extraido
+                st.session_state[f"campo_extraido_{campo.lower().replace(' ', '_')}"] = extraido
+                st.session_state["df_titulos"] = df_resultado
+                st.success(f"Campo '{campo}' extraído e salvo com sucesso usando a coluna '{col}'.")
 
-            st.success(f"Campo '{campo}' extraído com sucesso! Você pode revisar e editar abaixo.")
-            st.data_editor(df_resultado[[coluna_origem, campo]].head(20), use_container_width=True)
-
-            # Armazena no session_state para reutilização posterior
-            chave = f"campo_extraido_{campo.lower().replace(' ', '_')}"
-            st.session_state[chave] = df_resultado[campo]
-
-            # Se desejar armazenar o DataFrame completo com a nova coluna:
-            st.session_state["df_titulos"] = df_resultado
-
+        else:
+            st.markdown(f"<span style='color: #bbb;'>Coluna `{col}` → nenhum valor extraído.</span>", unsafe_allow_html=True)
