@@ -47,7 +47,7 @@ def executar(df):
             sel_col, chk = st.columns([2, 1])
             with sel_col:
                 coluna_selecionada = st.selectbox(
-                    f"Coluna para {campo}",
+                    #f"Coluna para {campo}",
                     colunas,
                     key=f"sel_col_{campo}"
                 )
