@@ -1,3 +1,10 @@
+#  ______ _________________  ___   ______
+#  |  ___|  ___| ___ \ ___ \/ _ \ |___  /
+#  | |_  | |__ | |_/ / |_/ / /_\ \   / / 
+#  |  _| |  __||    /|    /|  _  |  / /  
+#  | |   | |___| |\ \| |\ \| | | |./ /___
+#  \_|   \____/\_| \_\_| \_\_| |_/\_____/
+
 #Importação
 from utils.config import configurar_pagina
 
@@ -7,8 +14,22 @@ from PIL import Image
 from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
-from modules import fluxo_extracao_titulos
 from utils.menu_etapas import exibir_menu_lateral
+
+
+#Importação dos modulos
+from modules import (
+    fluxo_importacao_titulos,
+    fluxo_extracao_titulos,
+    fluxo_importacao_baixas,
+    fluxo_extracao_baixas,
+    fluxo_conciliacao,
+    fluxo_exportacao
+)
+
+
+
+
 
 import streamlit as st
 
