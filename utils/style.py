@@ -3,51 +3,28 @@ import streamlit as st
 def aplicar_css():
     st.markdown("""
         <style>
-            /* Fonte base do app */
+            /* Fonte e layout base */
             body {
                 font-size: 10px !important;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
 
-            /* Campos de entrada (inputs e selects) */
+            /* Inputs e componentes básicos */
             .stTextInput, .stSelectbox, .stSlider, .stFileUploader {
                 font-size: 10px !important;
                 margin-bottom: 0.3rem !important;
             }
 
-            /* Selectbox especificamente */
-            .stSelectbox > div {
-                font-size: 10px !important;
-            }
-
-            /* File uploader (drag and drop) */
-            .stFileUploader {
-                font-size: 10px !important;
-                line-height: 1.1 !important;
-                padding: 6px !important;
-            }
-
-            /* Tabelas (dataframe) */
-            .stDataFrame {
-                border-radius: 6px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            /* Selectbox - campo e itens */
+            section[data-testid="stSelectbox"] * {
                 font-size: 10px !important;
                 line-height: 1.2 !important;
             }
 
-            /* Tabela interna */
-            .stDataFrame table {
+            /* FileUploader - texto interno, limite, nome de arquivo */
+            section[data-testid="stFileUploader"] * {
                 font-size: 10px !important;
-                line-height: 1.1 !important;
-            }
-
-            /* Expander (visualização de dados) */
-            .stExpander .streamlit-expanderHeader {
-                font-weight: bold;
-                background-color: #f5f5f5;
-                border-radius: 6px;
-                font-size: 10px !important;
-                padding: 4px 8px !important;
+                line-height: 1.2 !important;
             }
 
             /* Botões */
@@ -63,8 +40,30 @@ def aplicar_css():
                 box-shadow: 0 3px 6px rgba(0,0,0,0.1);
             }
 
-            /* Mensagens (info, success, error) */
-            .stAlert {
+            /* DataFrame visualização */
+            .stDataFrame {
+                border-radius: 6px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+            }
+
+            .stDataFrame table {
+                font-size: 10px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Expanders */
+            .stExpander .streamlit-expanderHeader {
+                font-size: 10px !important;
+                font-weight: bold;
+                background-color: #f5f5f5;
+                padding: 4px 8px !important;
+                border-radius: 6px;
+            }
+
+            /* Mensagens: info, success, error, warning */
+            div.stAlert {
                 font-size: 10px !important;
                 padding: 8px 10px !important;
                 line-height: 1.3 !important;
@@ -72,7 +71,7 @@ def aplicar_css():
                 margin-bottom: 0.5rem !important;
             }
 
-            /* Cabeçalho do app */
+            /* Cabeçalho visual principal */
             .header {
                 background-color: white;
                 padding: 12px;
