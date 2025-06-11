@@ -1,3 +1,9 @@
+
+#Chama a função para configurar a página
+from utils.config import configurar_pagina
+configurar_pagina()  # deve ser o primeiro comando antes de qualquer uso do Streamlit
+
+
 import streamlit as st
 from datetime import datetime
 from PIL import Image
