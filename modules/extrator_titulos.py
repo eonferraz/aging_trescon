@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import re
 
+from modules import extrator_titulos
+extrator_titulos.executar(df)
+
 
 def executar(df):
     st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
