@@ -19,14 +19,9 @@ def executar():
             aba_selecionada = st.selectbox("Selecione a aba a ser importada", abas)
 
             if aba_selecionada:
+                st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
                 df = pd.read_excel(arquivo, sheet_name=aba_selecionada)
                 st.session_state["df_titulos"] = df  # Guarda no estado
-
-                st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
-
-                # Visualização opcional dos dados
-                #with st.expander("📋 Visualizar dados importados"):
-                #    st.dataframe(df, use_container_width=True)
 
         except Exception as e:
             st.error(f"Erro ao ler o arquivo: {e}")
