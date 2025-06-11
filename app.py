@@ -5,6 +5,7 @@ from PIL import Image
 from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
+from modules import importar_titulos
 import streamlit as st
 
 # ESTILIZAÇÃO
@@ -21,12 +22,25 @@ aplicar_css()
 
 #=======================================================================================================================================
 
+# EXECUÇÃO
+#=======================================================================================================================================
+
+
+# 01. Importação da planilha de títulos
 
 
 
 
 
 
+
+
+
+
+
+
+
+#=======================================================================================================================================
 
 
 
