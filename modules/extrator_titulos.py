@@ -41,32 +41,25 @@ def executar(df):
     campos_mapeados = {}
     campos_com_tratamento = {}
 
-    col_esq, col_dir = st.columns([3, 2])
+    st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
+    for i, campo in enumerate(CAMPOS_LOGICOS):
+        campos, sel_col, chk = st.columns([2, 2, 1], gap="small")
 
-    with col_esq:
-        st.markdown("<div class='custom-subheader'>Visuaização dos Dados Importados</div>", unsafe_allow_html=True)
-        st.dataframe(df.head(10), use_container_width=True)
+        with campos:
+            st.markdown(f"`{campo}`")
 
-    with col_dir:
-        st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
-        for i, campo in enumerate(CAMPOS_LOGICOS):
-            campos, sel_col, chk = st.columns([2, 2, 1])
+        with sel_col:
+            coluna_selecionada = st.selectbox(
+                f"Coluna para {campo}",
+                colunas,
+                key=f"sel_col_{i}"
+            )
 
-            with campos:
-                st.markdown(f"`{campo}`")
+        with chk:
+            precisa_tratar = st.checkbox("Regex?", key=f"chk_regex_{i}", value=True)
 
-            with sel_col:
-                coluna_selecionada = st.selectbox(
-                    "",
-                    colunas,
-                    key=f"sel_col_{i}"
-                )
-
-            with chk:
-                precisa_tratar = st.checkbox("Regex?", key=f"chk_regex_{i}", value=True)
-
-            campos_mapeados[campo] = coluna_selecionada
-            campos_com_tratamento[campo] = precisa_tratar
+        campos_mapeados[campo] = coluna_selecionada
+        campos_com_tratamento[campo] = precisa_tratar
 
     st.markdown("---")
     df_resultado = pd.DataFrame()
