@@ -77,8 +77,6 @@ def executar(df):
 
     # Aplicação de extrações ou cópias diretas
     st.markdown("---")
-    st.markdown("### Resultados das Extrações")
-    
     df_resultado = pd.DataFrame()
     
     for campo, coluna in campos_mapeados.items():
@@ -90,7 +88,7 @@ def executar(df):
             df_resultado[campo] = df[coluna].fillna("")
     
     # Mostra o resultado final tratado
-    st.markdown("### 📊 Dados extraídos (tratados)")
+    st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=True)
     
     # Salva o resultado limpo no session_state para conciliação/exportação futura
