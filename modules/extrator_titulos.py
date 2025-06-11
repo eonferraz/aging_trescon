@@ -1,3 +1,8 @@
+import streamlit as st
+import pandas as pd
+import re
+
+
 def executar(df):
     st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
