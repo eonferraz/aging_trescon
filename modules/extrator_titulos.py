@@ -36,6 +36,11 @@ def aplicar_regex_em_coluna(df, coluna, regex):
 
 #Função
 def executar(df):
+
+    # Se a etapa já passou, não exibe mais essa parte
+    if st.session_state.get("etapa") == "proxima_etapa":
+        return
+
     #st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
     if df.empty or df.shape[1] == 0:
