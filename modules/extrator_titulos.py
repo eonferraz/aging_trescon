@@ -122,10 +122,9 @@ def executar(df):
 
     st.success("Extração concluída com sucesso.")
     
-    # Exibe botão para avançar de etapa
+    # Exibe botão para avançar de etapa        
     if st.button("➡️ Próximo"):
         st.session_state["etapa"] = "proxima_etapa"
-        st.experimental_rerun()
+        st.stop()
             
     st.markdown("---")
-
