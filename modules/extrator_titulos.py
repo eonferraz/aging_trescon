@@ -34,8 +34,9 @@ def aplicar_regex_em_coluna(df, coluna, regex):
 
 def executar(df):
     """
-    Interface assistida para extrair campos de colunas com texto livre.
-    O usuário escolhe o campo desejado e o sistema analisa as colunas automaticamente.
+    Interface assistida com decisão final do usuário.
+    Analisa todas as colunas de texto, mostra sugestões de extração e permite
+    ao usuário escolher a coluna final para aplicar.
     """
     st.markdown("<div class='custom-subheader'>🧠 Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
@@ -45,7 +46,6 @@ def executar(df):
 
     campo = st.selectbox("Selecione o campo que deseja extrair:", CAMPOS_DISPONIVEIS)
     regex = REGEX_SUGERIDA.get(campo, "")
-
     colunas_texto = df.select_dtypes(include='object').columns.tolist()
 
     if not colunas_texto:
@@ -53,25 +53,44 @@ def executar(df):
         return
 
     st.markdown("### 🔎 Análise automática das colunas disponíveis")
+    colunas_com_sucesso = []
 
     for col in colunas_texto:
-        # Aplica o regex à coluna
         extraido = aplicar_regex_em_coluna(df, col, regex)
 
         if extraido is not None and extraido.notna().sum() > 0:
-            st.markdown(f"**Coluna:** `{col}` — valores extraídos encontrados:")
+            colunas_com_sucesso.append((col, extraido))
+            st.markdown(f"**Coluna candidata:** `{col}` — resultados encontrados:")
             preview = pd.DataFrame({
                 "Texto Original": df[col].head(5),
                 f"{campo} Extraído": extraido.head(5)
             })
             st.dataframe(preview, use_container_width=True)
 
-            if st.button(f"✅ Usar coluna '{col}' para '{campo}'"):
-                df_resultado = df.copy()
-                df_resultado[campo] = extraido
-                st.session_state[f"campo_extraido_{campo.lower().replace(' ', '_')}"] = extraido
-                st.session_state["df_titulos"] = df_resultado
-                st.success(f"Campo '{campo}' extraído e salvo com sucesso usando a coluna '{col}'.")
+    if not colunas_com_sucesso:
+        st.info("Nenhuma correspondência foi encontrada com a expressão padrão. Tente revisar a regex.")
+        return
 
-        else:
-            st.markdown(f"<span style='color: #bbb;'>Coluna `{col}` → nenhum valor extraído.</span>", unsafe_allow_html=True)
+    # Seleção final da coluna pelo usuário
+    colunas_nomes = [col[0] for col in colunas_com_sucesso]
+    coluna_escolhida = st.selectbox("✅ Selecione qual coluna deseja usar para extrair o campo:", colunas_nomes)
+
+    if coluna_escolhida:
+        extraido_final = dict(colunas_com_sucesso)[coluna_escolhida]
+
+        st.markdown("#### 📋 Resultado Final da Extração")
+        st.dataframe(pd.DataFrame({
+            "Texto Original": df[coluna_escolhida].head(10),
+            f"{campo} Extraído": extraido_final.head(10)
+        }), use_container_width=True)
+
+        if st.button("✔️ Aplicar Extração"):
+            df_resultado = df.copy()
+            df_resultado[campo] = extraido_final
+
+            # Armazenar resultado
+            chave = f"campo_extraido_{campo.lower().replace(' ', '_')}"
+            st.session_state[chave] = extraido_final
+            st.session_state["df_titulos"] = df_resultado
+
+            st.success(f"Campo '{campo}' extraído com sucesso da coluna '{coluna_escolhida}'!")
