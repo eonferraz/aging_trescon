@@ -1,5 +1,6 @@
 #Importação
 from utils.config import configurar_pagina
+
 from datetime import datetime
 from PIL import Image
 
@@ -7,6 +8,7 @@ from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
 from modules import fluxo_importacao
+from utils.menu_etapas import exibir_menu_lateral
 
 import streamlit as st
 
@@ -23,7 +25,16 @@ exibir_cabecalho()
 #Chama a aplicação de CSS que está em utils
 aplicar_css()
 
+
+# Mostra o menu lateral
+exibir_menu_lateral()
+
+
 #=======================================================================================================================================
+
+
+
+
 
 # EXECUÇÃO
 #=======================================================================================================================================
