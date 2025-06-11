@@ -61,5 +61,10 @@ def aplicar_css():
                 box-shadow: 0 2px 6px rgba(0,0,0,0.1);
                 margin-bottom: 15px;
             }
+            .subheader {
+                font-size: 12px !important;
+                font-weight: 400 !important;
+                margin-bottom: 0.2rem !important;
+            }
         </style>
     """, unsafe_allow_html=True)
