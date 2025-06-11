@@ -32,17 +32,8 @@ aplicar_css()
 
 # 01. Importação da planilha de títulos
 st.markdown("<div class='custom-subheader'>1️⃣ Importação dos Títulos Financeiros</div>", unsafe_allow_html=True)
-importar_titulos.executar()
 
-
-
-
-
-
-
-
-
-
+fluxo_importacao.executar()
 
 
 #=======================================================================================================================================
