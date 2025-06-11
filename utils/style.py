@@ -46,8 +46,11 @@ def aplicar_css():
 
             /* Alertas */
             .stAlert {
-                border-radius: 8px;
-                font-size: 10px !important;
+                border-radius: 3px;
+                font-size: 80px !important;
+                padding: 8px 12px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 0.5rem !important
             }
 
             /* Cabeçalho principal */
