@@ -11,7 +11,6 @@ def exibir_cabecalho():
                 <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=304,fit=crop,q=95/Aq2B471lDpFnv1BK/logo---trescon-30-anos-mv0jg6Lo2EiV7yLp.png" style="height: 30px;">
                 <div>
                     <h1 style="margin: 0; font-size: 1.0em;">Relatório de Aging - Conciliador</h1>
-                    <p style="margin: 0; color: #666;">Versão 1.1 - {data_formatada}</p>
                 </div>
             </div>
         </div>
