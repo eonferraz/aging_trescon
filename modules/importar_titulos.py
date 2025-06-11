@@ -1,3 +1,5 @@
+from modules import extrator_titulos  # novo import
+
 import streamlit as st  # Importa o Streamlit para construção da interface
 import pandas as pd     # Importa o pandas para leitura e manipulação de dados
 
