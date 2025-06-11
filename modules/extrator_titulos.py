@@ -20,6 +20,19 @@ REGEX_SUGERIDA = {
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
+#Aplicar regex
+def aplicar_regex_em_coluna(df, coluna, regex):
+    """
+    Aplica uma expressão regular (regex) à coluna do DataFrame e retorna os dados extraídos.
+    """
+    try:
+        return df[coluna].astype(str).str.extract(regex, expand=False)
+    except Exception as e:
+        st.error(f"Erro ao aplicar regex na coluna '{coluna}': {e}")
+        return None
+
+
+
 
 #Função
 def executar(df):
