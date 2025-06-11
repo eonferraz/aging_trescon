@@ -77,42 +77,29 @@ def executar(df):
 
     # Aplicação de extrações ou cópias diretas
     st.markdown("---")
-    st.markdown("### ✨ Resultados das Extrações")
-
-    df_resultado = df.copy()
-
-    extracoes = []  # Lista para armazenar os resultados extraídos
-
+    st.markdown("### Resultados das Extrações")
+    
+    df_resultado = pd.DataFrame()
+    
     for campo, coluna in campos_mapeados.items():
-        if coluna not in df.columns:
-            continue
-    
-        textos_originais = df[coluna].astype(str)
-    
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
-            extraidos = aplicar_regex_em_coluna(df, coluna, regex)
-    
-            for i, (texto, valor) in enumerate(zip(textos_originais, extraidos)):
-                extracoes.append({
-                    "Linha": i + 1,
-                    "Campo": campo,
-                    "Coluna Origem": coluna,
-                    "Texto Original": texto,
-                    "Valor Extraído": valor if pd.notna(valor) else "",
-                    "Tratado com Regex": True
-                })
-    
+            extraido = aplicar_regex_em_coluna(df, coluna, regex)
+            df_resultado[campo] = extraido.fillna("")
         else:
-            for i, texto in enumerate(textos_originais):
-                extracoes.append({
-                    "Linha": i + 1,
-                    "Campo": campo,
-                    "Coluna Origem": coluna,
-                    "Texto Original": texto,
-                    "Valor Extraído": texto,
-                    "Tratado com Regex": False
-                })
+            df_resultado[campo] = df[coluna].fillna("")
+    
+    # Mostra o resultado final tratado
+    st.markdown("### 📊 Dados extraídos (tratados)")
+    st.dataframe(df_resultado, use_container_width=True)
+    
+    # Salva o resultado limpo no session_state para conciliação/exportação futura
+    st.session_state["df_titulos"] = df_resultado
+    
+    st.markdown("---")
+    st.success("✅ Extração concluída com sucesso. Dados prontos para uso.")
+    
+    
     
     # Cria DataFrame com todos os resultados organizados
     df_extracoes = pd.DataFrame(extracoes)
