@@ -15,11 +15,17 @@ def executar():
             # Lista de abas
             abas = pd.ExcelFile(arquivo).sheet_names
 
-            # Escolha da aba
-            aba_selecionada = st.selectbox("Selecione a aba a ser importada", abas)
+            # Criação das colunas lado a lado
+            col1, col2 = st.columns([2, 3])  # ajuste a proporção conforme necessário
+
+            with col1:
+                aba_selecionada = st.selectbox("Selecione a aba a ser importada", abas)
+
+            with col2:
+                if aba_selecionada:
+                    st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
 
             if aba_selecionada:
-                st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
                 df = pd.read_excel(arquivo, sheet_name=aba_selecionada)
                 st.session_state["df_titulos"] = df  # Guarda no estado
 
