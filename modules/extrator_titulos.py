@@ -13,8 +13,8 @@ CAMPOS_LOGICOS = [
 
 # Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
-    "Fornecedor": r"(?i)CLIENTE[:\- ]+\s*(.+)",
-    "Número do Título": r"(?i)NF[:\- ]+(\d+)",
+    "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
+    "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
     "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
     "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
