@@ -27,7 +27,8 @@ aplicar_css()
 
 
 # 01. Importação da planilha de títulos
-
+st.subheader("1️⃣ Importação dos Títulos Financeiros")
+importar_titulos.executar()
 
 
 
