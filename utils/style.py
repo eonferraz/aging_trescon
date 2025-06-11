@@ -4,7 +4,7 @@ def aplicar_css():
     st.markdown("""
         <style>
             body {
-                font-size: 14px !important;
+                font-size: 11px !important;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
             .stTextInput, .stSelectbox, .stSlider, .stFileUploader {
@@ -13,6 +13,7 @@ def aplicar_css():
             .stDataFrame {
                 border-radius: 8px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                line-height: 1.2 !important;
             }
             .stButton>button {
                 transition: all 0.3s ease;
