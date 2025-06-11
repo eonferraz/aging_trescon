@@ -28,6 +28,11 @@ def executar():
                 # Mostra os dados carregados dentro de um expander
                 with st.expander("📋 Visualizar dados importados"):
                     st.dataframe(df, use_container_width=True)
+                    
+                # 🔁 Etapa opcional: extração de campos a partir de colunas misturadas
+                with st.expander("🧠 Extrair Campos do Texto (Histórico, NF, Fornecedor etc.)"):
+                    extrator_titulos.executar(df)
+       
 
         # Caso ocorra algum erro na leitura do arquivo ou da aba, exibe mensagem de erro
         except Exception as e:
