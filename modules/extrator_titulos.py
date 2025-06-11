@@ -84,15 +84,29 @@ def executar(df):
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
             extraido = aplicar_regex_em_coluna(df, coluna, regex)
+    
             if campo == "Número do Título":
-                df_resultado[campo] = extraido.fillna("").astype(str)
+                df_resultado[campo] = (
+                    extraido.fillna("")
+                    .astype(str)
+                    .str.replace(".0", "", regex=False)
+                    .str.strip()
+                    .str.zfill(9)
+                )
             else:
                 df_resultado[campo] = extraido.fillna("")
         else:
             if campo == "Número do Título":
-                df_resultado[campo] = df[coluna].fillna("").astype(str)
+                df_resultado[campo] = (
+                    df[coluna].fillna("")
+                    .astype(str)
+                    .str.replace(".0", "", regex=False)
+                    .str.strip()
+                    .str.zfill(9)
+                )
             else:
                 df_resultado[campo] = df[coluna].fillna("")
+
 
     # Mostra o resultado final tratado
     st.markdown("### Dados extraídos (tratados)")
