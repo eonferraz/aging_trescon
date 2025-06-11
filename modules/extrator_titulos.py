@@ -23,7 +23,7 @@ REGEX_SUGERIDA = {
 
 #Função
 def executar(df):
-    st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
+    #st.markdown("<div class='custom-subheader'>🧠 Mapeamento e Extração Assistida de Campos</div>", unsafe_allow_html=True)
 
     if df.empty or df.shape[1] == 0:
         st.warning("Nenhum dado disponível para análise. Importe os títulos primeiro.")
@@ -37,11 +37,11 @@ def executar(df):
     col_esq, col_dir = st.columns([3, 2])
 
     with col_esq:
-        st.markdown("### 🧾 Visualização dos Dados Importados")
+        st.markdown("<div class='custom-subheader'>Visuaização dos Dados Importados</div>", unsafe_allow_html=True)
         st.dataframe(df.head(10), use_container_width=True)
 
     with col_dir:
-        st.markdown("### 🛠️ Mapeamento de Campos")
+        st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
         for campo in CAMPOS_LOGICOS:
             st.markdown(f"`{campo}`")
             sel_col, chk = st.columns([2, 1])
