@@ -1,43 +1,40 @@
 import streamlit as st
-import pandas as pd
-import io
-import re
-import difflib
-import logging
 from datetime import datetime
+from PIL import Image
 
-# Configurações iniciais
-st.set_page_config(page_title="Aging - Conciliador", layout="wide", page_icon="📊")
+# Importar módulos (conforme forem sendo criados)
+from modules import upload_dados, conciliacao, resumo  # exemplo
 
-# Configuração de logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Cabeçalho com logo e data
+st.markdown(
+    """
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=304,fit=crop,q=95/Aq2B471lDpFnv1BK/logo---trescon-30-anos-mv0jg6Lo2EiV7yLp.png" style="height: 50px;">
+            <div>
+                <h1 style="margin: 0; font-size: 1.8em;">Relatório de Aging - Conciliador</h1>
+                <p style="margin: 0; color: #666;">Versão 1.1 - {date}</p>
+            </div>
+        </div>
+    </div>
+    """.format(date=datetime.now().strftime("%d/%m/%Y")),
+    unsafe_allow_html=True
+)
 
-# Constantes
-DEFAULT_CUTOFF = 0.4
-MAX_UPLOAD_SIZE = 200  # MB
-
-# CSS customizado
+# CSS personalizado
 st.markdown("""
     <style>
-        /* Melhorias gerais */
         body {
             font-size: 14px !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        /* Melhorar inputs */
         .stTextInput, .stSelectbox, .stSlider, .stFileUploader {
             margin-bottom: 0.5rem;
         }
-        
-        /* Melhorar tabelas */
         .stDataFrame {
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        
-        /* Botões */
         .stButton>button {
             transition: all 0.3s ease;
             border-radius: 6px;
@@ -46,20 +43,14 @@ st.markdown("""
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
-        /* Expanders */
         .stExpander .streamlit-expanderHeader {
             font-weight: bold;
             background-color: #f8f9fa;
             border-radius: 8px 8px 0 0;
         }
-        
-        /* Mensagens de erro */
         .stAlert {
             border-radius: 8px;
         }
-        
-        /* Cabeçalho */
         .header {
             background-color: white;
             padding: 15px;
@@ -69,3 +60,13 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
+# Etapas do processo
+st.subheader("1️⃣ Upload dos Arquivos")
+upload_dados.executar()  # Exemplo — criaremos esse módulo
+
+st.subheader("2️⃣ Conciliação de Títulos")
+conciliacao.executar()  # Próximo passo
+
+st.subheader("3️⃣ Resumo e Exportação")
+resumo.executar()
