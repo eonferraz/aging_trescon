@@ -98,18 +98,3 @@ def executar(df):
     
     st.markdown("---")
     st.success("✅ Extração concluída com sucesso. Dados prontos para uso.")
-    
-    
-    
-    # Cria DataFrame com todos os resultados organizados
-    df_extracoes = pd.DataFrame(extracoes)
-    st.markdown("### 📄 Resultado consolidado das extrações")
-    st.dataframe(df_extracoes, use_container_width=True)
-    
-    # Salva no session_state para exportação futura
-    st.session_state["df_extracoes"] = df_extracoes
-
-
-    st.session_state["df_titulos"] = df_resultado
-    st.markdown("---")
-    st.success("✅ Mapeamento e tratamento concluídos. Dados prontos para conciliação ou exportação.")
