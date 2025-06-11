@@ -18,5 +18,5 @@ aplicar_css()
 
 
 #Chama o rodapé
-from utils.config import exibir_rodape
+from utils.rodape import exibir_rodape
 exibir_rodape()
