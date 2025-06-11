@@ -114,6 +114,13 @@ def executar(df):
     
     # Salva o resultado limpo no session_state para conciliação/exportação futura
     st.session_state["df_titulos"] = df_resultado
-    
-    st.markdown("---")
+
     st.success("Extração concluída com sucesso.")
+    
+    # Mostrar botão "Próximo" após exibição
+    if st.button("➡️ Próximo"):
+        st.session_state["etapa"] = "proxima_etapa"
+        st.experimental_rerun()
+        
+    st.markdown("---")
+
