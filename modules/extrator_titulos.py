@@ -116,4 +116,4 @@ def executar(df):
     st.session_state["df_titulos"] = df_resultado
     
     st.markdown("---")
-    st.success("✅ Extração concluída com sucesso. Dados prontos para uso.")
+    st.success("Extração concluída com sucesso.")
