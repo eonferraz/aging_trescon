@@ -15,3 +15,8 @@ exibir_cabecalho()
 
 #Chama a aplicação de CSS que está em utils
 aplicar_css()
+
+
+#Chama o rodapé
+from utils.config import exibir_rodape
+exibir_rodape()
