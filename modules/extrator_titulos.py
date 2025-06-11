@@ -44,22 +44,21 @@ def executar(df):
     with col_dir:
         st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
         for campo in CAMPOS_LOGICOS:
-            #st.markdown(f"`{campo}`")
             campos, sel_col, chk = st.columns([2, 2, 1])
-            
+    
             with campos:
-                campos_ref = st.markdown(f"`{campo}`")
-            
+                st.markdown(f"`{campo}`")
+    
             with sel_col:
                 coluna_selecionada = st.selectbox(
-                    #f" {campo}",
-                    f"",
+                    "",
                     colunas,
                     key=f"sel_col_{campo}"
                 )
+    
             with chk:
                 precisa_tratar = st.checkbox("Regex?", key=f"chk_regex_{campo}", value=True)
-
+    
             campos_mapeados[campo] = coluna_selecionada
             campos_com_tratamento[campo] = precisa_tratar
 
