@@ -63,7 +63,7 @@ def executar(df):
                 )
 
             with chk:
-                precisa_tratar = st.checkbox("Regex?", key=f"chk_regex_{i}", value=True)
+                precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
 
             campos_mapeados[campo] = coluna_selecionada
             campos_com_tratamento[campo] = precisa_tratar
