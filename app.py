@@ -2,11 +2,10 @@
 from utils.config import configurar_pagina
 from datetime import datetime
 from PIL import Image
+
 from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
-
-from modules import importar_titulos
 from modules import fluxo_importacao
 
 import streamlit as st
@@ -47,5 +46,4 @@ fluxo_importacao.executar()
 
 
 #Chama o rodapé
-
 exibir_rodape()
