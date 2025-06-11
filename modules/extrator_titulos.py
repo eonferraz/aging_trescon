@@ -32,6 +32,7 @@ def executar(df):
     colunas = df.columns.tolist()
     campos_mapeados = {}
     campos_com_tratamento = {}
+    campos_ref = {}
 
     # Layout em duas colunas
     col_esq, col_dir = st.columns([3, 2])
@@ -43,11 +44,11 @@ def executar(df):
     with col_dir:
         st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
         for campo in CAMPOS_LOGICOS:
-            st.markdown(f"`{campo}`")
+            #st.markdown(f"`{campo}`")
             campos, sel_col, chk = st.columns([2, 2, 1])
             
             with campos:
-                
+                campos_ref = st.markdown(f"`{campo}`")
             
             with sel_col:
                 coluna_selecionada = st.selectbox(
