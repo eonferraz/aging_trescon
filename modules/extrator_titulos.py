@@ -55,12 +55,12 @@ def executar(df):
         col, col2 = st.columns([2, 1])
         with col:
             coluna_selecionada = st.selectbox(
-                f"→ Qual coluna contém o campo '{campo}'?",
+                #f"→ Qual coluna contém o campo '{campo}'?",
                 colunas,
                 key=f"sel_col_{campo}"
             )
         with col2:
-            precisa_tratar = st.checkbox("Tratar via regex?", key=f"chk_regex_{campo}", value=True)
+                precisa_tratar = st.checkbox("Tratar?", key=f"chk_regex_{campo}", value=True)
 
         campos_mapeados[campo] = coluna_selecionada
         campos_com_tratamento[campo] = precisa_tratar
