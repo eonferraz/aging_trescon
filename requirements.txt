@@ -5,3 +5,4 @@ xlsxwriter
 rapidfuzz
 unidecode
 openpyxl
+rapidfuzz
