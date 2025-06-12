@@ -21,8 +21,8 @@ def executar():
 
                 st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
 
-                with st.expander("📋 Visualizar dados de baixas importados"):
-                    st.dataframe(df, use_container_width=True)
+                # with st.expander("📋 Visualizar dados de baixas importados"):
+                st.dataframe(df, use_container_width=True)
 
         except Exception as e:
             st.error(f"Erro ao processar o arquivo: {e}")
