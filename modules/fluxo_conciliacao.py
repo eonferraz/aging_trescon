@@ -2,8 +2,19 @@
 import streamlit as st
 import pandas as pd
 import io
+import os
 from unidecode import unidecode
 from rapidfuzz import fuzz, process
+
+# Carrega de-para de fornecedores
+CAMINHO_DEPARA = "depara.xlsx"
+DEPARA_FORNECEDORES = {}
+if os.path.exists(CAMINHO_DEPARA):
+    try:
+        df_depara = pd.read_excel(CAMINHO_DEPARA, dtype=str)
+        DEPARA_FORNECEDORES = dict(zip(df_depara['de'].str.upper().str.strip(), df_depara['para'].str.strip()))
+    except Exception as e:
+        st.warning(f"Erro ao carregar de-para de fornecedores: {e}")
 
 def exportar_excel(df: pd.DataFrame):
     output = io.BytesIO()
@@ -26,6 +37,10 @@ def normalizar_fornecedor(nome):
     nome = nome.replace(" - ARMAZEM AILN", "")
     nome = nome.strip()
     return nome
+
+def aplicar_depara(valor):
+    chave = str(valor).strip().upper()
+    return DEPARA_FORNECEDORES.get(chave, valor)
 
 def mapear_fuzzy(lista_nomes, threshold=85):
     nomes_base = []
@@ -60,7 +75,6 @@ def executar():
     df_titulos = st.session_state["df_titulos"].copy()
     df_baixas = st.session_state["df_baixas"].copy()
 
-    # Padroniza campos dos títulos
     titulos = df_titulos.rename(columns={
         "Fornecedor": "FORNECEDOR TITULO",
         "Número do Título": "NUMERO DOC TITULO",
@@ -77,7 +91,6 @@ def executar():
     )
     titulos["VALOR NOMINAL"] = pd.to_numeric(titulos["VALOR NOMINAL"], errors="coerce").fillna(0)
 
-    # Padroniza campos das baixas
     baixas = df_baixas.rename(columns={
         "Fornecedor/Cliente": "FORNECEDOR BAIXA",
         "Número do Título": "NUMERO DOC BAIXA",
@@ -94,7 +107,6 @@ def executar():
     )
     baixas["VALOR NOMINAL"] = pd.to_numeric(baixas["VALOR NOMINAL"], errors="coerce").fillna(0) * -1
 
-    # Concatena e normaliza documentos
     df = pd.concat([titulos, baixas], ignore_index=True)
     df["NUMERO DOC TITULO"] = df["NUMERO DOC TITULO"].fillna(df["NUMERO DOC BAIXA"])
     df["NUMERO DOC BAIXA"] = df["NUMERO DOC BAIXA"].fillna(df["NUMERO DOC TITULO"])
@@ -110,11 +122,9 @@ def executar():
     df["FORNECEDOR CONSIDERADO"] = df["FORNECEDOR TITULO"]
     df.loc[df["TIPO"] == "Baixa", "FORNECEDOR CONSIDERADO"] = df["FORNECEDOR BAIXA"]
 
-    # Aplica agrupamento inteligente
     mapa_fuzzy = mapear_fuzzy(df["FORNECEDOR CONSIDERADO"].unique())
     df["FORNECEDOR AJUSTADO"] = df["FORNECEDOR CONSIDERADO"].map(mapa_fuzzy)
 
-    # Fornecedor Ajustado 2: primeiro fornecedor não vazio por documento
     referencia_fornecedor = (
         df[df["FORNECEDOR AJUSTADO"] != ""]
         .groupby("NUMERO DOC")["FORNECEDOR AJUSTADO"]
@@ -123,7 +133,8 @@ def executar():
     )
     df["FORNECEDOR AJUSTADO 2"] = df["NUMERO DOC"].map(referencia_fornecedor).fillna("")
 
-    # Calcula status por documento
+    df["FORNECEDOR AJUSTADO 3"] = df["FORNECEDOR AJUSTADO 2"].apply(aplicar_depara)
+
     status_map = {}
     for doc in df["NUMERO DOC"].unique():
         grupo = df[df["NUMERO DOC"] == doc]
@@ -141,7 +152,7 @@ def executar():
     df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
     df = df[[
-        "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR CONSIDERADO", "FORNECEDOR AJUSTADO", "FORNECEDOR AJUSTADO 2",
+        "TIPO", "FORNECEDOR AJUSTADO 3",
         "NUMERO DOC TITULO", "NUMERO DOC BAIXA", "NUMERO DOC",
         "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
         "VALOR NOMINAL", "STATUS DA CONCILIAÇÃO"
@@ -152,5 +163,4 @@ def executar():
     st.dataframe(df, use_container_width=True)
     st.session_state["df_conciliado"] = df
 
-    # Exportação
     exportar_excel(df)
