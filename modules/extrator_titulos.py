@@ -42,7 +42,7 @@ def executar(df):
     campos_com_tratamento = {}
     
     #---------------------------------------------------------------------------------------------------------------------
-    st.markdown("---")
+    #st.markdown("---")
     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
     st.dataframe(df.head(5), use_container_width=True)
     
@@ -70,7 +70,7 @@ def executar(df):
     #---------------------------------------------------------------------------------------------------------------------
     # col_esq, col_dir = st.columns([3, 2])
 
-    # st.markdown("---")
+    # #st.markdown("---")
     
     # with col_esq:
     #     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
@@ -97,7 +97,7 @@ def executar(df):
     #         campos_mapeados[campo] = coluna_selecionada
     #         campos_com_tratamento[campo] = precisa_tratar
 
-    # st.markdown("---")
+    # #st.markdown("---")
     #---------------------------------------------------------------------------------------------------------------------
     
     df_resultado = pd.DataFrame()
@@ -129,7 +129,7 @@ def executar(df):
             else:
                 df_resultado[campo] = df[coluna].fillna("")
                 
-    st.markdown("---")
+    #st.markdown("---")
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=False)
     
@@ -141,4 +141,4 @@ def executar(df):
         st.session_state["etapa"] = "proxima_etapa"
         st.experimental_rerun()
 
-    st.markdown("---")
+    #st.markdown("---")
