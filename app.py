@@ -69,6 +69,7 @@ with st.expander("2️⃣ Baixas"):
 with st.expander("3️⃣ Conciliação"):
     if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
         fluxo_conciliacao.executar()
+        fluxo_exportacao.executar()       
         
 # with st.expander("4️⃣ Exportação"):
 #     if "conciliacao_finalizada" in st.session_state:
