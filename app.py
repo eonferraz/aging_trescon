@@ -62,22 +62,28 @@ fluxo_importacao_titulos.executar()
 # Etapa 2 - Extração Títulos (se df_titulos estiver presente)
 if "df_titulos" in st.session_state:
     fluxo_extracao_titulos.executar()
+    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
+
 
 # Etapa 3 - Importação Baixas
 if "extracao_titulos" in st.session_state["etapas_concluidas"]:
     fluxo_importacao_baixas.executar()
+    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
 
 # Etapa 4 - Extração Baixas
 if "df_baixas" in st.session_state:
     fluxo_extracao_baixas.executar()
+    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
 
 # Etapa 5 - Conciliação
 if "extracao_baixas" in st.session_state["etapas_concluidas"]:
     fluxo_conciliacao.executar()
+    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
 
 # Etapa 6 - Exportação
 if "conciliacao" in st.session_state["etapas_concluidas"]:
     fluxo_exportacao.executar()
+    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
 
 #=======================================================================================================================================
 
