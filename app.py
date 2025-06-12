@@ -54,10 +54,12 @@ aplicar_css()
 #=======================================================================================================================================
 with st.expander("1️⃣ Importação dos Títulos Financeiros", expanded=True):
     fluxo_importacao_titulos.executar()
-
-with st.expander("2️⃣ Extração de Campos dos Títulos"):
     if "df_titulos" in st.session_state:
         fluxo_extracao_titulos.executar()
+        
+# with st.expander("2️⃣ Extração de Campos dos Títulos"):
+#     if "df_titulos" in st.session_state:
+#         fluxo_extracao_titulos.executar()
 
 with st.expander("3️⃣ Importação das Baixas"):
     if "df_titulos" in st.session_state:
