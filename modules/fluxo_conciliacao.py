@@ -12,40 +12,60 @@ def executar():
     df_titulos = st.session_state["df_titulos"].copy()
     df_baixas = st.session_state["df_baixas"].copy()
 
-    # Renomeia e padroniza campos
-    df_titulos_ren = df_titulos.rename(columns={
+    # Padroniza campos dos títulos
+    titulos = df_titulos.rename(columns={
         "Fornecedor": "FORNECEDOR",
         "Número do Título": "NUMERO DOC",
-        "Data de Emissão": "EMISSÃO",
+        "Data de Emissão": "EMISSAO",
         "Data de Vencimento": "VENCIMENTO",
-        "Valor do Título": "VALOR"
+        "Valor do Título": "VALOR NOMINAL"
     })
-    df_titulos_ren["TIPO"] = "Título"
-    df_titulos_ren["DATA PAGAMENTO"] = ""
+    titulos["TIPO"] = "Título"
+    titulos["DATA PAGAMENTO"] = ""
+    titulos["VALOR NOMINAL"] = titulos["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\\s': ''}, regex=True).astype(str)
 
-    df_baixas_ren = df_baixas.rename(columns={
+    # Padroniza campos das baixas
+    baixas = df_baixas.rename(columns={
         "Fornecedor/Cliente": "FORNECEDOR",
         "Número do Título": "NUMERO DOC",
         "Data de Pagamento": "DATA PAGAMENTO",
-        "Valor Pago": "VALOR"
+        "Valor Pago": "VALOR NOMINAL"
     })
-    df_baixas_ren["TIPO"] = "Baixa"
-    df_baixas_ren["EMISSÃO"] = ""
-    df_baixas_ren["VENCIMENTO"] = ""
+    baixas["TIPO"] = "Baixa"
+    baixas["EMISSAO"] = ""
+    baixas["VENCIMENTO"] = ""
+    baixas["VALOR NOMINAL"] = baixas["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\\s': ''}, regex=True).astype(str)
+    baixas["VALOR NOMINAL"] = "-" + baixas["VALOR NOMINAL"]
 
-    # Normaliza valor
-    df_baixas_ren["VALOR"] = df_baixas_ren["VALOR"].replace({',': '.', 'R$': '', '\s': ''}, regex=True).astype(str)
-    df_baixas_ren["VALOR"] = "-" + df_baixas_ren["VALOR"]
+    # Concatena e organiza
+    df = pd.concat([titulos, baixas], ignore_index=True)
+    df["NUMERO DOC"] = df["NUMERO DOC"].astype(str).str.zfill(9)
+    for campo in ["EMISSAO", "VENCIMENTO", "DATA PAGAMENTO"]:
+        df[campo] = pd.to_datetime(df[campo], errors="coerce", dayfirst=True)
 
-    df_conciliado = pd.concat([df_titulos_ren, df_baixas_ren], ignore_index=True)
-    df_conciliado["NUMERO DOC"] = df_conciliado["NUMERO DOC"].astype(str).str.zfill(9)
+    # Calcula status por documento
+    status_map = {}
+    for doc in df["NUMERO DOC"].unique():
+        grupo = df[df["NUMERO DOC"] == doc]
+        has_titulo = "Título" in grupo["TIPO"].values
+        has_baixa = "Baixa" in grupo["TIPO"].values
+        if has_titulo and has_baixa:
+            status_map[doc] = "OK"
+        elif has_titulo:
+            status_map[doc] = "Pagamento não encontrado"
+        elif has_baixa:
+            status_map[doc] = "Título não encontrado"
+        else:
+            status_map[doc] = "Inconsistente"
 
-    # Converte datas
-    for campo in ["EMISSÃO", "VENCIMENTO", "DATA PAGAMENTO"]:
-        df_conciliado[campo] = pd.to_datetime(df_conciliado[campo], errors="coerce", dayfirst=True)
+    df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
-    # Ordena
-    df_conciliado = df_conciliado.sort_values(by=["NUMERO DOC", "DATA PAGAMENTO", "TIPO"], ascending=[True, True, False])
+    # Ordena para relatório analítico
+    df = df[[
+        "TIPO", "NUMERO DOC", "FORNECEDOR", "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
+        "VALOR NOMINAL", "STATUS DA CONCILIAÇÃO"
+    ]]
+    df = df.sort_values(by=["NUMERO DOC", "TIPO", "DATA PAGAMENTO"], ascending=[True, False, True])
 
-    st.dataframe(df_conciliado, use_container_width=True)
-    st.session_state["df_conciliado"] = df_conciliado
+    st.dataframe(df, use_container_width=True)
+    st.session_state["df_conciliado"] = df
