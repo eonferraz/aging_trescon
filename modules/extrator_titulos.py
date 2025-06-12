@@ -17,7 +17,8 @@ REGEX_SUGERIDA = {
     "Data da Baixa": r"(?i)(\d{2}/\d{2}/\d{4})",
     "Valor da Baixa": r"(?i)VALOR[:\- R$]*([\d\.,]+)",
     "Documento": r"(?i)DOC[:\-\s]*([\w/\\-]+)",
-    "Conta": r"(?i)CONTA[:\-\s]*(.+)"
+    "Conta": r"(?i)CONTA[:\-\s]*(.+)",
+    "Cliente": r"(?i)CLIENTE[:\- ]*(.+)"  # exemplo adicional
 }
 
 
