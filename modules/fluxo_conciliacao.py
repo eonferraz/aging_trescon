@@ -32,9 +32,11 @@ def mapear_fuzzy(lista_nomes, threshold=85):
     grupos = {}
     for nome in lista_nomes:
         nome_base = normalizar_fornecedor(nome)
-        melhor, score = process.extractOne(nome_base, nomes_base, scorer=fuzz.token_sort_ratio)
+        if not nomes_base:
+            nomes_base.append(nome_base)
+            grupos[nome] = nome_base
+            continue
 
-        
         resultado = process.extractOne(nome_base, nomes_base, scorer=fuzz.token_sort_ratio)
         if resultado is not None:
             melhor, score = resultado
@@ -46,12 +48,8 @@ def mapear_fuzzy(lista_nomes, threshold=85):
         else:
             nomes_base.append(nome_base)
             grupos[nome] = nome_base
-        # if score and score >= threshold:
-        #     grupos[nome] = melhor
-        # else:
-        #     nomes_base.append(nome_base)
-        #     grupos[nome] = nome_base
     return grupos
+
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
