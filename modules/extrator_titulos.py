@@ -138,8 +138,8 @@ def executar(df):
     st.success("Extração concluída com sucesso.")
 
     # Exibe botão para avançar de etapa        
-    if st.button("➡️ Próximo"):
-        if "extracao_titulos" not in st.session_state["etapas_concluidas"]:
-            st.session_state["etapas_concluidas"].append("extracao_titulos")
-        st.experimental_rerun()
+    # if st.button("➡️ Próximo"):
+    #     if "extracao_titulos" not in st.session_state["etapas_concluidas"]:
+    #         st.session_state["etapas_concluidas"].append("extracao_titulos")
+    #     st.experimental_rerun()
 
