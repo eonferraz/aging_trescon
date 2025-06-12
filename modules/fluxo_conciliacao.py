@@ -1,7 +1,7 @@
 # modules/fluxo_conciliacao.py
 import streamlit as st
 import pandas as pd
-from modules.exportar_excel import exportar_excel
+from modules.exportar_excel import executar as exportar_excel
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
