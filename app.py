@@ -50,8 +50,11 @@ aplicar_css()
 exibir_menu_lateral()
 
 # Inicializa o estado das etapas concluídas
-if "etapas_concluidas" not in st.session_state:
+# if "etapas_concluidas" not in st.session_state:
+#     st.session_state["etapas_concluidas"] = []
+if "etapas_concluidas" not in st.session_state or not isinstance(st.session_state["etapas_concluidas"], list):
     st.session_state["etapas_concluidas"] = []
+
 
 # Etapa 1 - Importação Títulos
 fluxo_importacao_titulos.executar()
