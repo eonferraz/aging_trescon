@@ -121,7 +121,10 @@ def executar(df):
     if "df_conciliado" in st.session_state:
         df_conciliado = st.session_state["df_conciliado"]
         if "Fornecedor Ajustado 2" in df_conciliado.columns:
-            df_conciliado["Fornecedor Ajustado 3"] = df_conciliado["Fornecedor Ajustado 2"].apply(aplicar_depara)
+            # Inserir logo após "Fornecedor Ajustado 2"
+            cols = df_conciliado.columns.tolist()
+            idx = cols.index("Fornecedor Ajustado 2") + 1
+            df_conciliado.insert(loc=idx, column="Fornecedor Ajustado 3", value=df_conciliado["Fornecedor Ajustado 2"].apply(aplicar_depara))
             st.session_state["df_conciliado"] = df_conciliado
 
             # Exibe prévia com Fornecedor Ajustado 3
