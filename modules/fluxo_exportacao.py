@@ -1,35 +1,16 @@
-# modules/fluxo_exportacao.py
-
-import streamlit as st
+# utils/exportar_excel.py
 import pandas as pd
 import io
+import streamlit as st
 
-def executar():
-    st.markdown("### 📦 Exportação dos Dados Conciliados")
-
-    if "df_titulos" not in st.session_state or "df_baixas" not in st.session_state:
-        st.warning("Títulos e/ou Baixas ainda não estão carregados.")
-        return
-
-    # Placeholder até termos a conciliação final consolidada
-    df_resultado = pd.concat([
-        st.session_state["df_titulos"].assign(Origem="Títulos"),
-        st.session_state["df_baixas"].assign(Origem="Baixas")
-    ])
-
-    st.dataframe(df_resultado, use_container_width=True)
-
-    # Exportação como Excel
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        df_resultado.to_excel(writer, index=False, sheet_name="Resultado")
-        # writer.save()
-
+def exportar_relatorio_conciliacao(df: pd.DataFrame):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="Conciliação")
+        writer.close()
     st.download_button(
-        label="🔳 Baixar Arquivo Excel",
-        data=buffer.getvalue(),
-        file_name="resultado_conciliado.xlsx",
+        label="📥 Baixar Relatório em Excel",
+        data=output.getvalue(),
+        file_name="relatorio_conciliacao.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-    st.success("Arquivo pronto para download.")
