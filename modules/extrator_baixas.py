@@ -43,20 +43,45 @@ def executar(df):
 
     col1, col2, col3, col4 = st.columns(4)
 
-    for i, campo in enumerate(CAMPOS_BAIXAS):
-        with [col1, col2, col3, col4][i]:
+    
+    
+    for campo in CAMPOS_BAIXAS:
+        col_label, col_select, col_check = st.columns([2, 3, 1])
+        
+        with col_label:
             st.markdown(f"**{campo}**")
-            coluna_selecionada = st.selectbox("", colunas, key=f"sel_col_baixas_{campo}")
+        
+        with col_select:
+            coluna_selecionada = st.selectbox(
+                label="",
+                options=colunas,
+                key=f"sel_col_baixas_{campo}"
+            )
+        
+        with col_check:
             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_baixas_{campo}", value=True)
-
+        
         campos_mapeados[campo] = coluna_selecionada
         campos_com_tratamento[campo] = precisa_tratar
+
+    
+    # for i, campo in enumerate(CAMPOS_BAIXAS):
+    #     with [col1, col2, col3, col4][i]:
+    #         st.markdown(f"**{campo}**")
+    #         coluna_selecionada = st.selectbox("", colunas, key=f"sel_col_baixas_{campo}")
+    #         precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_baixas_{campo}", value=True)
+
+    #     campos_mapeados[campo] = coluna_selecionada
+    #     campos_com_tratamento[campo] = precisa_tratar
 
     st.markdown("---")
     st.markdown("#### ✨ Resultado da Extração de Baixas")
 
     df_resultado = pd.DataFrame()
 
+
+    
+    
     for campo, coluna in campos_mapeados.items():
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
