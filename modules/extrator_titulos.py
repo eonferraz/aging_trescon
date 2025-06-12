@@ -43,8 +43,10 @@ def executar(df):
 
     col_esq, col_dir = st.columns([3, 2])
 
+    st.markdown("---")
+    
     with col_esq:
-        st.markdown("<div class='custom-subheader'>Visuaização dos Dados Importados</div>", unsafe_allow_html=True)
+        st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
         st.dataframe(df.head(10), use_container_width=True)
 
     with col_dir:
@@ -69,6 +71,7 @@ def executar(df):
             campos_com_tratamento[campo] = precisa_tratar
 
     st.markdown("---")
+    
     df_resultado = pd.DataFrame()
 
     for campo, coluna in campos_mapeados.items():
@@ -99,8 +102,8 @@ def executar(df):
                 df_resultado[campo] = df[coluna].fillna("")
 
     st.markdown("### Dados extraídos (tratados)")
-    st.dataframe(df_resultado, use_container_width=True)
-
+    st.dataframe(df_resultado, use_container_width=False)
+    
     st.session_state["df_titulos"] = df_resultado
 
     st.success("Extração concluída com sucesso.")
