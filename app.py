@@ -61,8 +61,10 @@ with st.expander("1️⃣ Títulos Financeiros", expanded=True):
 with st.expander("2️⃣ Baixas"):
     if "df_titulos" in st.session_state:
         fluxo_importacao_baixas.executar()
-        if "df_baixas" in st.session_state:
-            fluxo_extracao_baixas.executar()
+        fluxo_extracao_baixas.executar()
+        
+        # if "df_baixas" in st.session_state:
+        #     fluxo_extracao_baixas.executar()
         
 with st.expander("3️⃣ Conciliação"):
     if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
