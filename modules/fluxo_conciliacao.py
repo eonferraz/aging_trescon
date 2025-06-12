@@ -21,7 +21,7 @@ def exportar_excel(df: pd.DataFrame):
     with pd.ExcelWriter(output, engine="xlsxwriter", datetime_format="dd/mm/yyyy") as writer:
         df.to_excel(writer, index=False, sheet_name="Conciliação")
     st.download_button(
-        label="📅 Baixar Relatório em Excel",
+        label="🗕️ Baixar Relatório em Excel",
         data=output.getvalue(),
         file_name="relatorio_conciliacao.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -152,7 +152,7 @@ def executar():
     df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
     df = df[[
-        "TIPO", "FORNECEDOR AJUSTADO 3",
+        "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR AJUSTADO 3",
         "NUMERO DOC TITULO", "NUMERO DOC BAIXA", "NUMERO DOC",
         "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
         "VALOR NOMINAL", "STATUS DA CONCILIAÇÃO"
