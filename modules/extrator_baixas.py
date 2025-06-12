@@ -14,7 +14,7 @@ CAMPOS_BAIXAS = [
 # Regex sugerida para cada campo
 REGEX_SUGERIDA = {
     # Fornecedor/Cliente
-    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|CF\s+NF\s+\d+\s+DE\s+|Ref\s+NF\s+\d+\s+NF\s+\d+[- ]*)?([A-Z0-9\s\.\-/]+?(?:LTDA|LTD|S/A|SA|S\.A\.|Ltda|Automoveis|AUTOM|SUCATA|MATTEO|BRASIL))",
+    "Fornecedor/Cliente": r"(?i)(?:DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+|CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|CF\s+NF\s+\d+\s+DE\s+|Ref\s+NF\s+\d+\s+NF\s+\d+[- ]*)?([A-Z0-9\s\.\-/]+?(?:LTDA|LTD|S/A|SA|S\.A\.|Ltda|Automoveis|AUTOM|SUCATA|MATTEO|BRASIL))",
 
     # Número do Título
     "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*|RECEITA\s+NF[:\- ]*|INCL\s+TIT\s+AB[-\s]*\d*\s*[-]?)?(\d{5,})",
@@ -84,8 +84,13 @@ def executar(df):
             valores_finais = valores_finais.apply(lambda x: x.replace(".", "").replace(",", ".") if "," in x else x)
             valores_convertidos = pd.to_numeric(valores_finais, errors="coerce")
             df_resultado[campo] = valores_convertidos.round(2)
+        elif campo == "Data de Pagamento":
+            df_resultado[campo] = pd.to_datetime(valores_finais, errors="coerce", dayfirst=True)
         else:
             df_resultado[campo] = valores_finais
+
+    # Remove registros sem data de pagamento
+    df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
 
     st.dataframe(df_resultado, use_container_width=True)
     st.session_state["df_baixas"] = df_resultado
