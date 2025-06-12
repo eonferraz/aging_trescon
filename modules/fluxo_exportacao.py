@@ -7,7 +7,7 @@ def executar(df: pd.DataFrame):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Conciliação")
-        writer.close()
+        # NÃO chame writer.close() aqui!
     st.download_button(
         label="📥 Baixar Relatório em Excel",
         data=output.getvalue(),
