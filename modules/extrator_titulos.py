@@ -65,40 +65,6 @@ def executar(df):
     
     #---------------------------------------------------------------------------------------------------------------------
 
-
-    
-    #---------------------------------------------------------------------------------------------------------------------
-    # col_esq, col_dir = st.columns([3, 2])
-
-    # #st.markdown("---")
-    
-    # with col_esq:
-    #     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
-    #     st.dataframe(df.head(10), use_container_width=True)
-
-    # with col_dir:
-    #     st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
-    #     for i, campo in enumerate(CAMPOS_LOGICOS):
-    #         campos, sel_col, chk = st.columns([2, 2, 1])
-
-    #         with campos:
-    #             st.markdown(f"`{campo}`")
-
-    #         with sel_col:
-    #             coluna_selecionada = st.selectbox(
-    #                 "",
-    #                 colunas,
-    #                 key=f"sel_col_{i}"
-    #             )
-
-    #         with chk:
-    #             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
-
-    #         campos_mapeados[campo] = coluna_selecionada
-    #         campos_com_tratamento[campo] = precisa_tratar
-
-    # #st.markdown("---")
-    #---------------------------------------------------------------------------------------------------------------------
     
     df_resultado = pd.DataFrame()
 
@@ -128,8 +94,7 @@ def executar(df):
                 )
             else:
                 df_resultado[campo] = df[coluna].fillna("")
-                
-    #st.markdown("---")
+
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=True)
     
