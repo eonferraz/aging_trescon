@@ -14,7 +14,7 @@ from PIL import Image
 from utils.style import aplicar_css
 from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
-from utils.menu_etapas import exibir_menu_lateral
+# from utils.menu_etapas import exibir_menu_lateral
 
 #Importação dos modulos
 from modules import (
