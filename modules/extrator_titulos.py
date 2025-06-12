@@ -11,14 +11,6 @@ CAMPOS_LOGICOS = [
     "Valor do Título"
 ]
 
-# Expressões regulares sugeridas por campo
-# REGEX_SUGERIDA = {
-#     "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
-#     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-#     "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
-#     "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
-#     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
-# }
 
 REGEX_SUGERIDA = {
     "Fornecedor": r"(?i)(?:CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|EXPORT[:\-]?\s*|RECEITA\s+NF\S*\s*[:\-]?\s*|INCL\s+TIT\s+AB\S*\s+DE\s+)?([A-Z0-9\s\.\-\/]+?(?:LTDA|S\/A|SA|LTD|Ltda|S.A.))",
@@ -144,9 +136,3 @@ def executar(df):
     st.session_state["df_titulos"] = df_resultado
     
     st.success("Extração concluída com sucesso.")
-
-    # Exibe botão para avançar de etapa        
-    # if st.button("➡️ Próximo"):
-    #     if "extracao_titulos" not in st.session_state["etapas_concluidas"]:
-    #         st.session_state["etapas_concluidas"].append("extracao_titulos")
-    #     st.experimental_rerun()
