@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import re
+import os
 
 # Campos esperados para extração
 CAMPOS_BAIXAS = [
@@ -26,6 +27,15 @@ REGEX_SUGERIDA = {
     "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
+# Carrega de-para de fornecedores
+CAMINHO_DEPARA = "depara.xlsx"
+DEPARA_FORNECEDORES = {}
+if os.path.exists(CAMINHO_DEPARA):
+    try:
+        df_depara = pd.read_excel(CAMINHO_DEPARA, dtype=str)
+        DEPARA_FORNECEDORES = dict(zip(df_depara['de'].str.upper().str.strip(), df_depara['para'].str.strip()))
+    except Exception as e:
+        st.warning(f"Erro ao carregar de-para de fornecedores: {e}")
 
 def aplicar_regex_em_coluna(df, coluna, regex):
     try:
@@ -35,11 +45,12 @@ def aplicar_regex_em_coluna(df, coluna, regex):
         return None
 
 def limpar_fornecedor(texto):
-    texto = re.sub(r"\bNFE\b", "", texto, flags=re.IGNORECASE)
-    texto = re.sub(r"\bCLIENTE:\s*", "", texto, flags=re.IGNORECASE)
-    texto = re.sub(r"\bDE\b", "", texto, flags=re.IGNORECASE)
-    texto = re.sub(r"\b\d{1,6}\b", "", texto)  # Remove números de até 6 dígitos isolados
-    return texto.strip()
+    texto = re.sub(r"\\bNFE\\b", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\\bCLIENTE:\s*", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\\bDE\\b", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\\b\d{1,6}\\b", "", texto)  # Remove números de até 6 dígitos isolados
+    texto = texto.strip().upper()
+    return DEPARA_FORNECEDORES.get(texto, texto)
 
 def executar(df):
     if df.empty or df.shape[1] == 0:
