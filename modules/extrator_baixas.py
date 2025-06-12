@@ -14,7 +14,7 @@ CAMPOS_BAIXAS = [
 # Regex sugerida para cada campo
 REGEX_SUGERIDA = {
     # Fornecedor/Cliente
-    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z\s]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
+    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z0-9\s\.\-/]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
 
     # Número do Título
     "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
@@ -85,6 +85,10 @@ def executar(df):
                 .str.replace(".", "", regex=False)
                 .str.replace(",", ".", regex=False)
             )
+        elif campo == "Data de Pagamento":
+            df_resultado[campo] = valores_finais
+        elif campo == "Fornecedor/Cliente":
+            df_resultado[campo] = valores_finais
         else:
             df_resultado[campo] = valores_finais
 
