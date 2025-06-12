@@ -23,7 +23,7 @@ REGEX_SUGERIDA = {
     "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
 
     # Valor Pago
-    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d]+[.,][\d]{2})"
+    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
 
@@ -80,12 +80,17 @@ def executar(df):
                 .str.zfill(9)
             )
         elif campo == "Valor Pago":
-            df_resultado[campo] = (
-                valores_finais
-                .str.replace(",", ".", regex=False)
-                .astype(float)
-                .round(2)
-            )
+            try:
+                df_resultado[campo] = (
+                    valores_finais
+                    .str.replace(".", "", regex=False)
+                    .str.replace(",", ".", regex=False)
+                    .astype(float)
+                    .round(2)
+                )
+            except Exception as e:
+                st.warning(f"Erro ao converter valor pago: {e}")
+                df_resultado[campo] = valores_finais
         else:
             df_resultado[campo] = valores_finais
 
