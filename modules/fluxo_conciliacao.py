@@ -36,7 +36,7 @@ def mapear_fuzzy(lista_nomes, threshold=85):
             nomes_base.append(nome_base)
             grupos[nome] = nome_base
             continue
-            
+
         resultado = process.extractOne(nome_base, nomes_base, scorer=fuzz.token_sort_ratio)
         if resultado is not None:
             melhor, score = resultado
@@ -49,8 +49,6 @@ def mapear_fuzzy(lista_nomes, threshold=85):
             nomes_base.append(nome_base)
             grupos[nome] = nome_base
     return grupos
-
-
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
@@ -75,7 +73,7 @@ def executar():
     titulos["NUMERO DOC BAIXA"] = None
     titulos["FORNECEDOR BAIXA"] = None
     titulos["VALOR NOMINAL"] = (
-        titulos["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
+        titulos["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\\s': ''}, regex=True)
     )
     titulos["VALOR NOMINAL"] = pd.to_numeric(titulos["VALOR NOMINAL"], errors="coerce").fillna(0)
 
@@ -92,7 +90,7 @@ def executar():
     baixas["NUMERO DOC TITULO"] = None
     baixas["FORNECEDOR TITULO"] = None
     baixas["VALOR NOMINAL"] = (
-        baixas["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
+        baixas["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\\s': ''}, regex=True)
     )
     baixas["VALOR NOMINAL"] = pd.to_numeric(baixas["VALOR NOMINAL"], errors="coerce").fillna(0) * -1
 
