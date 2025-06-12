@@ -36,7 +36,7 @@ def mapear_fuzzy(lista_nomes, threshold=85):
             nomes_base.append(nome_base)
             grupos[nome] = nome_base
             continue
-
+            
         resultado = process.extractOne(nome_base, nomes_base, scorer=fuzz.token_sort_ratio)
         if resultado is not None:
             melhor, score = resultado
@@ -49,6 +49,7 @@ def mapear_fuzzy(lista_nomes, threshold=85):
             nomes_base.append(nome_base)
             grupos[nome] = nome_base
     return grupos
+
 
 
 def executar():
