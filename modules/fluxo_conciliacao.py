@@ -1,7 +1,8 @@
 # modules/fluxo_conciliacao.py
 import streamlit as st
-import io
 import pandas as pd
+import io
+from unidecode import unidecode
 
 def exportar_excel(df: pd.DataFrame):
     output = io.BytesIO()
@@ -15,6 +16,14 @@ def exportar_excel(df: pd.DataFrame):
         key="download_conciliacao"
     )
 
+def normalizar_fornecedor(nome):
+    nome = unidecode(str(nome)).upper()
+    nome = nome.replace(" LTDA", "").replace(" LTDA.", "").replace(" LTD", "").replace(" LTD.", "")
+    nome = nome.replace(" S/A", "").replace(" S. A.", "")
+    nome = nome.replace("AUTOMOVEIS", "").replace("AUTOM", "")
+    nome = nome.strip()
+    return nome
+
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
 
@@ -27,44 +36,54 @@ def executar():
 
     # Padroniza campos dos títulos
     titulos = df_titulos.rename(columns={
-        "Fornecedor": "FORNECEDOR",
-        "Número do Título": "NUMERO DOC",
+        "Fornecedor": "FORNECEDOR TITULO",
+        "Número do Título": "NUMERO DOC TITULO",
         "Data de Emissão": "EMISSAO",
         "Data de Vencimento": "VENCIMENTO",
         "Valor do Título": "VALOR NOMINAL"
     })
     titulos["TIPO"] = "Título"
     titulos["DATA PAGAMENTO"] = pd.NaT
+    titulos["NUMERO DOC BAIXA"] = None
+    titulos["FORNECEDOR BAIXA"] = None
     titulos["VALOR NOMINAL"] = (
-        titulos["VALOR NOMINAL"]
-        .astype(str)
-        .replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
+        titulos["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
     )
     titulos["VALOR NOMINAL"] = pd.to_numeric(titulos["VALOR NOMINAL"], errors="coerce").fillna(0)
 
     # Padroniza campos das baixas
     baixas = df_baixas.rename(columns={
-        "Fornecedor/Cliente": "FORNECEDOR",
-        "Número do Título": "NUMERO DOC",
+        "Fornecedor/Cliente": "FORNECEDOR BAIXA",
+        "Número do Título": "NUMERO DOC BAIXA",
         "Data de Pagamento": "DATA PAGAMENTO",
         "Valor Pago": "VALOR NOMINAL"
     })
     baixas["TIPO"] = "Baixa"
     baixas["EMISSAO"] = pd.NaT
     baixas["VENCIMENTO"] = pd.NaT
+    baixas["NUMERO DOC TITULO"] = None
+    baixas["FORNECEDOR TITULO"] = None
     baixas["VALOR NOMINAL"] = (
-        baixas["VALOR NOMINAL"]
-        .astype(str)
-        .replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
+        baixas["VALOR NOMINAL"].astype(str).replace({',': '.', 'R\$': '', '\s': ''}, regex=True)
     )
     baixas["VALOR NOMINAL"] = pd.to_numeric(baixas["VALOR NOMINAL"], errors="coerce").fillna(0) * -1
 
-    # Concatena e organiza
+    # Concatena e normaliza documentos
     df = pd.concat([titulos, baixas], ignore_index=True)
+    df["NUMERO DOC TITULO"] = df["NUMERO DOC TITULO"].fillna(df["NUMERO DOC BAIXA"])
+    df["NUMERO DOC BAIXA"] = df["NUMERO DOC BAIXA"].fillna(df["NUMERO DOC TITULO"])
+    df["NUMERO DOC"] = df["NUMERO DOC TITULO"].fillna(df["NUMERO DOC BAIXA"])
     df["NUMERO DOC"] = df["NUMERO DOC"].astype(str).str.zfill(9)
 
     for campo in ["EMISSAO", "VENCIMENTO", "DATA PAGAMENTO"]:
         df[campo] = pd.to_datetime(df[campo], errors="coerce", dayfirst=True)
+
+    df["FORNECEDOR TITULO"] = df["FORNECEDOR TITULO"].fillna("")
+    df["FORNECEDOR BAIXA"] = df["FORNECEDOR BAIXA"].fillna("")
+
+    df["FORNECEDOR CONSIDERADO"] = df["FORNECEDOR TITULO"]
+    df.loc[df["TIPO"] == "Baixa", "FORNECEDOR CONSIDERADO"] = df["FORNECEDOR BAIXA"]
+    df["FORNECEDOR AJUSTADO"] = df["FORNECEDOR CONSIDERADO"].apply(normalizar_fornecedor)
 
     # Calcula status por documento
     status_map = {}
@@ -83,11 +102,13 @@ def executar():
 
     df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
-    # Ordena para relatório analítico
     df = df[[
-        "TIPO", "NUMERO DOC", "FORNECEDOR", "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
+        "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR CONSIDERADO", "FORNECEDOR AJUSTADO",
+        "NUMERO DOC TITULO", "NUMERO DOC BAIXA", "NUMERO DOC",
+        "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
         "VALOR NOMINAL", "STATUS DA CONCILIAÇÃO"
     ]]
+
     df = df.sort_values(by=["NUMERO DOC", "TIPO", "DATA PAGAMENTO"], ascending=[True, False, True])
 
     st.dataframe(df, use_container_width=True)
@@ -95,4 +116,3 @@ def executar():
 
     # Exportação
     exportar_excel(df)
-
