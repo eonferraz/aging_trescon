@@ -13,18 +13,13 @@ CAMPOS_LOGICOS = [
 
 # Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
-    # Fornecedor/Cliente
-    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z\s]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
-
-    # Número do Título
-    "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
-
-    # Data de Pagamento (data final do texto)
-    "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
-
-    # Valor Pago
-    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
+    "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*|Ref NF |CF NF[:\- ]*|RECEITA NF(?: EXPORT)?: |DEV NF |NF[:\- ]*)(\d{6,})",
+    "Data da Baixa": r"(?i)(\d{2}/\d{2}/\d{4})",
+    "Valor da Baixa": r"(?i)VALOR[:\- R$]*([\d\.,]+)",
+    "Documento": r"(?i)DOC[:\-\s]*([\w/\\-]+)",
+    "Conta": r"(?i)CONTA[:\-\s]*(.+)"
 }
+
 
 # Aplica uma expressão regular (regex) à coluna do DataFrame e retorna os dados extraídos.
 def aplicar_regex_em_coluna(df, coluna, regex):
@@ -67,45 +62,9 @@ def executar(df):
             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
 
         campos_mapeados[campo] = coluna_selecionada
-        campos_com_tratamento[campo] = precisa_tratar
-    
+        campos_com_tratamento[campo] = precisa_tratar    
     #---------------------------------------------------------------------------------------------------------------------
-
-
-    
-    #---------------------------------------------------------------------------------------------------------------------
-    # col_esq, col_dir = st.columns([3, 2])
-
-    # #st.markdown("---")
-    
-    # with col_esq:
-    #     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
-    #     st.dataframe(df.head(10), use_container_width=True)
-
-    # with col_dir:
-    #     st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
-    #     for i, campo in enumerate(CAMPOS_LOGICOS):
-    #         campos, sel_col, chk = st.columns([2, 2, 1])
-
-    #         with campos:
-    #             st.markdown(f"`{campo}`")
-
-    #         with sel_col:
-    #             coluna_selecionada = st.selectbox(
-    #                 "",
-    #                 colunas,
-    #                 key=f"sel_col_{i}"
-    #             )
-
-    #         with chk:
-    #             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
-
-    #         campos_mapeados[campo] = coluna_selecionada
-    #         campos_com_tratamento[campo] = precisa_tratar
-
-    # #st.markdown("---")
-    #---------------------------------------------------------------------------------------------------------------------
-    
+   
     df_resultado = pd.DataFrame()
 
     for campo, coluna in campos_mapeados.items():
