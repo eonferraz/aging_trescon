@@ -13,11 +13,19 @@ CAMPOS_BAIXAS = [
 
 # Regex sugerida para cada campo
 REGEX_SUGERIDA = {
-    "Fornecedor/Cliente": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
-    "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-    "Data de Pagamento": r"(?i)(?:PAGAMENTO|PGTO|LIQUIDAÇÃO)?[:\- ]*(\d{2}/\d{2}/\d{4})",
-    "Valor Pago": r"(?i)VALOR(?:\s*PAGO)?[:\- R$]*([\d\.,]+)"
+    # Fornecedor/Cliente
+    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z\s]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
+
+    # Número do Título
+    "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
+
+    # Data de Pagamento (data final do texto)
+    "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
+
+    # Valor Pago
+    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
+
 
 
 def aplicar_regex_em_coluna(df, coluna, regex):
