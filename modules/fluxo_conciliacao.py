@@ -1,7 +1,19 @@
 # modules/fluxo_conciliacao.py
 import streamlit as st
+import io
 import pandas as pd
-from modules.exportar_excel import executar as exportar_excel
+
+def exportar_excel(df: pd.DataFrame):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter", datetime_format="dd/mm/yyyy") as writer:
+        df.to_excel(writer, index=False, sheet_name="Conciliação")
+    st.download_button(
+        label="📥 Baixar Relatório em Excel",
+        data=output.getvalue(),
+        file_name="relatorio_conciliacao.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key="download_conciliacao"
+    )
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
@@ -83,3 +95,4 @@ def executar():
 
     # Exportação
     exportar_excel(df)
+
