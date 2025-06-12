@@ -3,7 +3,7 @@ import pandas as pd
 import io
 import streamlit as st
 
-def executar(df: pd.DataFrame):
+def exportar_excel(df: pd.DataFrame):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter", datetime_format="dd/mm/yyyy") as writer:
         df.to_excel(writer, index=False, sheet_name="Conciliação")
@@ -13,5 +13,5 @@ def executar(df: pd.DataFrame):
         data=output.getvalue(),
         file_name="relatorio_conciliacao.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="botao_download_conciliacao"  # ✅ chave única para evitar duplicidade
+        key="botao_exportar_conciliacao"  # <- chave única e fixa
     )
