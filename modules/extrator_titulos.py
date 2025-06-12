@@ -11,7 +11,6 @@ CAMPOS_LOGICOS = [
     "Valor do Título"
 ]
 
-
 REGEX_SUGERIDA = {
     "Fornecedor": r"(?i)(?:CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|EXPORT[:\-]?\s*|RECEITA\s+NF\S*\s*[:\-]?\s*|INCL\s+TIT\s+AB\S*\s+DE\s+)?([A-Z0-9\s\.\-\/]+?(?:LTDA|S\/A|SA|LTD|Ltda|S.A.))",
     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
@@ -20,13 +19,16 @@ REGEX_SUGERIDA = {
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
-# Aplica uma expressão regular (regex) à coluna do DataFrame e retorna os dados extraídos.
-def aplicar_regex_em_coluna(df, coluna, regex):
+# Aplica uma expressão regular (regex) com fallback ao valor original
+
+def aplicar_regex_com_fallback(df, coluna, regex):
     try:
-        return df[coluna].astype(str).str.extract(regex, expand=False)
+        extraido = df[coluna].astype(str).str.extract(regex, expand=False)
+        fallback = df[coluna].astype(str)
+        return extraido.where(extraido.notnull(), fallback)
     except Exception as e:
         st.error(f"Erro ao aplicar regex na coluna '{coluna}': {e}")
-        return None
+        return df[coluna].astype(str)
 
 # Função principal de execução
 def executar(df):
@@ -40,19 +42,14 @@ def executar(df):
     colunas = df.columns.tolist()
     campos_mapeados = {}
     campos_com_tratamento = {}
-    
-    #---------------------------------------------------------------------------------------------------------------------
-    #st.markdown("---")
+
     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
     st.dataframe(df.head(5), use_container_width=True)
-    
+
     st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
 
     col_map_1, col_map_2, col_map_3, col_map_4, col_map_5 = st.columns(5)
     colunas_mapeamento = [col_map_1, col_map_2, col_map_3, col_map_4, col_map_5]
-
-    campos_mapeados = {}
-    campos_com_tratamento = {}
 
     for i, (campo, col) in enumerate(zip(CAMPOS_LOGICOS, colunas_mapeamento)):
         with col:
@@ -62,16 +59,13 @@ def executar(df):
 
         campos_mapeados[campo] = coluna_selecionada
         campos_com_tratamento[campo] = precisa_tratar
-    
-    #---------------------------------------------------------------------------------------------------------------------
 
-    
     df_resultado = pd.DataFrame()
 
     for campo, coluna in campos_mapeados.items():
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
-            extraido = aplicar_regex_em_coluna(df, coluna, regex)
+            extraido = aplicar_regex_com_fallback(df, coluna, regex)
 
             if campo == "Número do Título":
                 df_resultado[campo] = (
@@ -95,9 +89,14 @@ def executar(df):
             else:
                 df_resultado[campo] = df[coluna].fillna("")
 
+    # Converte e remove linhas com Data de Emissão inválida ou vazia
+    if "Data de Emissão" in df_resultado.columns:
+        df_resultado["Data de Emissão"] = pd.to_datetime(df_resultado["Data de Emissão"], errors="coerce", dayfirst=True)
+        df_resultado = df_resultado[df_resultado["Data de Emissão"].notnull()]
+
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=True)
-    
+
     st.session_state["df_titulos"] = df_resultado
-    
+
     st.success("Extração concluída com sucesso.")
