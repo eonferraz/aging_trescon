@@ -111,12 +111,15 @@ def executar(df):
         else:
             df_resultado[campo] = valores_finais
 
-    # Cria Fornecedor Ajustado 3 com base no de-para
-    if "Fornecedor Ajustado 2" in df_resultado.columns:
-        df_resultado["Fornecedor Ajustado 3"] = df_resultado["Fornecedor Ajustado 2"].apply(aplicar_depara)
-
     # Remove registros sem data de pagamento
     df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
+
+    # Aplica de-para SOMENTE NO DATAFRAME CONCILIADO
+    if "df_conciliado" in st.session_state:
+        df_conciliado = st.session_state["df_conciliado"]
+        if "Fornecedor Ajustado 2" in df_conciliado.columns:
+            df_conciliado["Fornecedor Ajustado 3"] = df_conciliado["Fornecedor Ajustado 2"].apply(aplicar_depara)
+            st.session_state["df_conciliado"] = df_conciliado
 
     st.dataframe(df_resultado, use_container_width=True)
     st.session_state["df_baixas"] = df_resultado
