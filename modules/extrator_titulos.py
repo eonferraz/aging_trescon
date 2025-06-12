@@ -131,7 +131,7 @@ def executar(df):
                 
     #st.markdown("---")
     st.markdown("### Dados extraídos (tratados)")
-    st.dataframe(df_resultado, use_container_width=False)
+    st.dataframe(df_resultado, use_container_width=True)
     
     st.session_state["df_titulos"] = df_resultado
 
