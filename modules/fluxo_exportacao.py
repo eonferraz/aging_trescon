@@ -23,7 +23,7 @@ def executar():
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         df_resultado.to_excel(writer, index=False, sheet_name="Resultado")
-        writer.save()
+        # writer.save()
 
     st.download_button(
         label="🔳 Baixar Arquivo Excel",
