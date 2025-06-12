@@ -23,7 +23,7 @@ REGEX_SUGERIDA = {
     "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
 
     # Valor Pago
-    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
+    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d]+[.,][\d]{2})"
 }
 
 
@@ -82,7 +82,6 @@ def executar(df):
         elif campo == "Valor Pago":
             df_resultado[campo] = (
                 valores_finais
-                .str.replace(".", "", regex=False)
                 .str.replace(",", ".", regex=False)
                 .astype(float)
                 .round(2)
