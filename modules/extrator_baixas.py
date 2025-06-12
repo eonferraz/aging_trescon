@@ -14,10 +14,10 @@ CAMPOS_BAIXAS = [
 # Regex sugerida para cada campo
 REGEX_SUGERIDA = {
     # Fornecedor/Cliente
-    "Fornecedor/Cliente": r"(?i)(?:COMPENS\s+ADTO\s+CLIENTE\s+Ref\s+NF\s+\d+\s+NCC\d{2}-\s*|DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+|CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|CF\s+NF\s+\d+\s+DE\s+|Ref\s+NF\s+\d+\s+NF\s+\d+[- ]*)?([A-Z0-9\s\.\-/]+?(?:LTDA|LTD|S/A|SA|S\.A\.|Ltda|Automoveis|AUTOM|SUCATA|MATTEO|BRASIL|RENAULT))",
+    "Fornecedor/Cliente": r"(?i)(?:COMPENS\s+ADTO\s+CLIENTE\s+REF\s+NF\s+\d+\s+NF\s+\d+-\s*|COMPENS\s+ADTO\s+CLIENTE\s+Ref\s+NF\s+\d+\s+NCC\d{2}-\s*|DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+|CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|CF\s+NF\s+\d+\s+DE\s+|Ref\s+NF\s+\d+\s+NF\s+\d+[- ]*)?([A-Z0-9\s\.\-/]+?(?:LTDA|LTD|S/A|SA|S\.A\.|Ltda|Automoveis|AUTOM|SUCATA|MATTEO|BRASIL|RENAULT|PEUGEOT|CITROEN))",
 
     # Número do Título
-    "Número do Título": r"(?i)(?:COMPENS\s+ADTO\s+CLIENTE\s+Ref\s+NF\s+|NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*|RECEITA\s+NF[:\- ]*|INCL\s+TIT\s+AB[-\s]*\d*\s*[-]?)?(\d{5,})",
+    "Número do Título": r"(?i)(?:COMPENS\s+ADTO\s+CLIENTE\s+REF\s+NF\s+|COMPENS\s+ADTO\s+CLIENTE\s+Ref\s+NF\s+|NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*|RECEITA\s+NF[:\- ]*|INCL\s+TIT\s+AB[-\s]*\d*\s*[-]?)?(\d{5,})",
 
     # Data de Pagamento (data final do texto)
     "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
