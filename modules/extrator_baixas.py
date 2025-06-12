@@ -28,7 +28,7 @@ REGEX_SUGERIDA = {
 }
 
 # Carrega de-para de fornecedores
-CAMINHO_DEPARA = "depara.xlsx"
+CAMINHO_DEPARA = "depara_fornecedores.xlsx"
 DEPARA_FORNECEDORES = {}
 if os.path.exists(CAMINHO_DEPARA):
     try:
