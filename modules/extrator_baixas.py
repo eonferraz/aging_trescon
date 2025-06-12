@@ -39,17 +39,13 @@ def executar(df):
 
     st.markdown("### 🛠️ Mapeamento das Baixas")
 
-    for campo in CAMPOS_BAIXAS:
-        campos, sel_col, chk = st.columns([2, 2, 1])
+    col1, col2, col3, col4 = st.columns(4)
 
-        with campos:
-            st.markdown(f"`{campo}`")
-
-        with sel_col:
+    for i, campo in enumerate(CAMPOS_BAIXAS):
+        with [col1, col2, col3, col4][i]:
+            st.markdown(f"**{campo}**")
             coluna_selecionada = st.selectbox("", colunas, key=f"sel_col_baixas_{campo}")
-
-        with chk:
-            precisa_tratar = st.checkbox("Regex?", key=f"chk_regex_baixas_{campo}", value=True)
+            precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_baixas_{campo}", value=True)
 
         campos_mapeados[campo] = coluna_selecionada
         campos_com_tratamento[campo] = precisa_tratar
