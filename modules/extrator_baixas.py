@@ -84,6 +84,8 @@ def executar(df):
                 valores_finais
                 .str.replace(".", "", regex=False)
                 .str.replace(",", ".", regex=False)
+                .astype(float)
+                .round(2)
             )
         else:
             df_resultado[campo] = valores_finais
