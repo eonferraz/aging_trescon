@@ -27,7 +27,6 @@ REGEX_SUGERIDA = {
 }
 
 
-
 def aplicar_regex_em_coluna(df, coluna, regex):
     try:
         return df[coluna].astype(str).str.extract(regex, expand=False)
@@ -45,9 +44,8 @@ def executar(df):
     campos_mapeados = {}
     campos_com_tratamento = {}
 
-
     #-------------------------------------------------------------------------------------------------------------------
-    st.markdown("#### 🧭 Mapeamento de Campos para Baixas")
+    st.markdown("#### 🧽 Mapeamento de Campos para Baixas")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -65,35 +63,30 @@ def executar(df):
 
     df_resultado = pd.DataFrame()
 
-
-    
-    
     for campo, coluna in campos_mapeados.items():
+        coluna_original = df[coluna].fillna("").astype(str).str.strip()
+
         if campos_com_tratamento[campo]:
             regex = REGEX_SUGERIDA.get(campo, "")
-            extraido = aplicar_regex_em_coluna(df, coluna, regex)
-
-            if campo == "Número do Título":
-                df_resultado[campo] = (
-                    extraido.fillna("")
-                    .astype(str)
-                    .str.replace(".0", "", regex=False)
-                    .str.strip()
-                    .str.zfill(9)
-                )
-            else:
-                df_resultado[campo] = extraido.fillna("")
+            extraido = aplicar_regex_em_coluna(df, coluna, regex).fillna("").astype(str).str.strip()
+            valores_finais = extraido.combine_first(coluna_original)
         else:
-            if campo == "Número do Título":
-                df_resultado[campo] = (
-                    df[coluna].fillna("")
-                    .astype(str)
-                    .str.replace(".0", "", regex=False)
-                    .str.strip()
-                    .str.zfill(9)
-                )
-            else:
-                df_resultado[campo] = df[coluna].fillna("")
+            valores_finais = coluna_original
+
+        if campo == "Número do Título":
+            df_resultado[campo] = (
+                valores_finais
+                .str.replace(".0", "", regex=False)
+                .str.zfill(9)
+            )
+        elif campo == "Valor Pago":
+            df_resultado[campo] = (
+                valores_finais
+                .str.replace(".", "", regex=False)
+                .str.replace(",", ".", regex=False)
+            )
+        else:
+            df_resultado[campo] = valores_finais
 
     st.dataframe(df_resultado, use_container_width=True)
     st.session_state["df_baixas"] = df_resultado
