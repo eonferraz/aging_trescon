@@ -37,7 +37,7 @@ def executar(df):
     campos_mapeados = {}
     campos_com_tratamento = {}
 
-    st.markdown("### 🛠️ Mapeamento das Baixas")
+    st.markdown("#### 🧭 Mapeamento de Campos para Baixas")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -51,6 +51,8 @@ def executar(df):
         campos_com_tratamento[campo] = precisa_tratar
 
     st.markdown("---")
+    st.markdown("#### ✨ Resultado da Extração de Baixas")
+
     df_resultado = pd.DataFrame()
 
     for campo, coluna in campos_mapeados.items():
@@ -80,7 +82,5 @@ def executar(df):
             else:
                 df_resultado[campo] = df[coluna].fillna("")
 
-    st.markdown("### ✅ Baixas extraídas com sucesso")
     st.dataframe(df_resultado, use_container_width=True)
-
     st.session_state["df_baixas"] = df_resultado
