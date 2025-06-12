@@ -10,7 +10,7 @@ def exportar_excel(df: pd.DataFrame):
     with pd.ExcelWriter(output, engine="xlsxwriter", datetime_format="dd/mm/yyyy") as writer:
         df.to_excel(writer, index=False, sheet_name="Conciliação")
     st.download_button(
-        label="📥 Baixar Relatório em Excel",
+        label="📅 Baixar Relatório em Excel",
         data=output.getvalue(),
         file_name="relatorio_conciliacao.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -114,6 +114,15 @@ def executar():
     mapa_fuzzy = mapear_fuzzy(df["FORNECEDOR CONSIDERADO"].unique())
     df["FORNECEDOR AJUSTADO"] = df["FORNECEDOR CONSIDERADO"].map(mapa_fuzzy)
 
+    # Fornecedor Ajustado 2: primeiro fornecedor não vazio por documento
+    referencia_fornecedor = (
+        df[df["FORNECEDOR AJUSTADO"] != ""]
+        .groupby("NUMERO DOC")["FORNECEDOR AJUSTADO"]
+        .first()
+        .to_dict()
+    )
+    df["FORNECEDOR AJUSTADO 2"] = df["NUMERO DOC"].map(referencia_fornecedor).fillna("")
+
     # Calcula status por documento
     status_map = {}
     for doc in df["NUMERO DOC"].unique():
@@ -132,7 +141,7 @@ def executar():
     df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
     df = df[[
-        "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR CONSIDERADO", "FORNECEDOR AJUSTADO",
+        "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR CONSIDERADO", "FORNECEDOR AJUSTADO", "FORNECEDOR AJUSTADO 2",
         "NUMERO DOC TITULO", "NUMERO DOC BAIXA", "NUMERO DOC",
         "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
         "VALOR NOMINAL", "STATUS DA CONCILIAÇÃO"
