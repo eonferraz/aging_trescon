@@ -1,6 +1,7 @@
 # modules/fluxo_conciliacao.py
 import streamlit as st
 import pandas as pd
+from modules.exportar_excel import exportar_excel
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
@@ -21,8 +22,8 @@ def executar():
         "Valor do Título": "VALOR NOMINAL"
     })
     titulos["TIPO"] = "Título"
-    titulos["DATA PAGAMENTO"] = ""
-    titulos["VALOR NOMINAL"] = titulos["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\\s': ''}, regex=True).astype(str)
+    titulos["DATA PAGAMENTO"] = pd.NaT
+    titulos["VALOR NOMINAL"] = titulos["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\s': ''}, regex=True).astype(float)
 
     # Padroniza campos das baixas
     baixas = df_baixas.rename(columns={
@@ -32,14 +33,14 @@ def executar():
         "Valor Pago": "VALOR NOMINAL"
     })
     baixas["TIPO"] = "Baixa"
-    baixas["EMISSAO"] = ""
-    baixas["VENCIMENTO"] = ""
-    baixas["VALOR NOMINAL"] = baixas["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\\s': ''}, regex=True).astype(str)
-    baixas["VALOR NOMINAL"] = "-" + baixas["VALOR NOMINAL"]
+    baixas["EMISSAO"] = pd.NaT
+    baixas["VENCIMENTO"] = pd.NaT
+    baixas["VALOR NOMINAL"] = baixas["VALOR NOMINAL"].replace({',': '.', 'R\$': '', '\s': ''}, regex=True).astype(float) * -1
 
     # Concatena e organiza
     df = pd.concat([titulos, baixas], ignore_index=True)
     df["NUMERO DOC"] = df["NUMERO DOC"].astype(str).str.zfill(9)
+
     for campo in ["EMISSAO", "VENCIMENTO", "DATA PAGAMENTO"]:
         df[campo] = pd.to_datetime(df[campo], errors="coerce", dayfirst=True)
 
@@ -69,3 +70,6 @@ def executar():
 
     st.dataframe(df, use_container_width=True)
     st.session_state["df_conciliado"] = df
+
+    # Exportação
+    exportar_excel(df)
