@@ -13,11 +13,17 @@ CAMPOS_LOGICOS = [
 
 # Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
-    "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
-    "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
-    "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
-    "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
+    # Fornecedor/Cliente
+    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z\s]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
+
+    # Número do Título
+    "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
+
+    # Data de Pagamento (data final do texto)
+    "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
+
+    # Valor Pago
+    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
 # Aplica uma expressão regular (regex) à coluna do DataFrame e retorna os dados extraídos.
