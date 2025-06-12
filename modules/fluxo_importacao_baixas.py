@@ -13,17 +13,22 @@ def executar():
     if arquivo:
         try:
             abas = pd.ExcelFile(arquivo).sheet_names
-            aba_selecionada = st.selectbox("Selecione a aba de baixas", abas, key="aba_baixas")
+
+            col1, col2 = st.columns([2, 3])  # proporção ajustável conforme o espaço
+
+            with col1:
+                aba_selecionada = st.selectbox("Selecione a aba de baixas", abas, key="aba_baixas")
+
+            with col2:
+                if aba_selecionada:
+                    st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
 
             if aba_selecionada:
                 df = pd.read_excel(arquivo, sheet_name=aba_selecionada)
                 st.session_state["df_baixas"] = df
 
-                st.success(f"Aba '{aba_selecionada}' carregada com sucesso!")
-
-                # with st.expander("📋 Visualizar dados de baixas importados"):
-                st.dataframe(df, use_container_width=True)
+                with st.expander("📋 Visualizar dados de baixas importados"):
+                    st.dataframe(df, use_container_width=True)
 
         except Exception as e:
             st.error(f"Erro ao processar o arquivo: {e}")
-
