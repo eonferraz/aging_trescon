@@ -11,36 +11,28 @@ CAMPOS_BAIXAS = [
     "Valor Pago"
 ]
 
-# Lista de regexs alternativas para cada campo
-REGEX_SUGERIDA_MULTIPLA = {
-    "Fornecedor/Cliente": [
-        r"(?i)(?:DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+)([A-Z0-9\s\.\-/]+)",
-        r"(?i)(?:DE\s+)([A-Z0-9\s\.\-/]+?)\s*(?:RECLASS|LANCTO|REF|$)",
-        r"(?i)([A-Z0-9\s\.\-/]+?(?:LTDA|S/A|SA|LTD|Ltda|S\.A\.))"
-    ],
-    "Número do Título": [
-        r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})"
-    ],
-    "Data de Pagamento": [
-        r"(?i)(\d{2}/\d{2}/\d{2,4})$"
-    ],
-    "Valor Pago": [
-        r"(?i)VALOR[:\- R$]*([\d\.,]+)"
-    ]
+# Regex sugerida para cada campo
+REGEX_SUGERIDA = {
+    # Fornecedor/Cliente
+    "Fornecedor/Cliente": r"(?i)(?:DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+)([A-Z0-9\s\.\-/]+)",
+
+    # Número do Título
+    "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
+
+    # Data de Pagamento (data final do texto)
+    "Data de Pagamento": r"(?i)(\d{2}/\d{2}/\d{2,4})$",
+
+    # Valor Pago
+    "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
 
-def aplicar_regex_em_coluna_multiplas(df, coluna, lista_regex):
-    base = df[coluna].astype(str)
-    resultado_final = pd.Series(["" for _ in range(len(base))], index=base.index)
-
-    for regex in lista_regex:
-        extraido = base.str.extract(regex, expand=False)
-        if isinstance(extraido, pd.DataFrame):
-            extraido = extraido[0]  # se vier DataFrame, pega a primeira coluna
-        resultado_final = resultado_final.where(resultado_final != "", extraido)
-
-    return resultado_final
+def aplicar_regex_em_coluna(df, coluna, regex):
+    try:
+        return df[coluna].astype(str).str.extract(regex, expand=False)
+    except Exception as e:
+        st.error(f"Erro ao aplicar regex na coluna '{coluna}': {e}")
+        return None
 
 
 def executar(df):
@@ -75,8 +67,8 @@ def executar(df):
         coluna_original = df[coluna].fillna("").astype(str).str.strip()
 
         if campos_com_tratamento[campo]:
-            lista_regex = REGEX_SUGERIDA_MULTIPLA.get(campo, [])
-            extraido = aplicar_regex_em_coluna_multiplas(df, coluna, lista_regex).fillna("").astype(str).str.strip()
+            regex = REGEX_SUGERIDA.get(campo, "")
+            extraido = aplicar_regex_em_coluna(df, coluna, regex).fillna("").astype(str).str.strip()
             valores_finais = extraido.combine_first(coluna_original)
         else:
             valores_finais = coluna_original
