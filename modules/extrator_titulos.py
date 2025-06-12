@@ -13,13 +13,12 @@ CAMPOS_LOGICOS = [
 
 # Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
-    "Fornecedor": r"(?i)(?:CLIENTE[:\- ]*|DE\s+)([A-Z0-9\s\/\.\-]+(?:LTDA|LTD|S\/A)?)"
+    "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-    "Data da Emissão": r"(?i)(\d{2}/\d{2}/\d{4})",
-    "Data de Vencimento": r"(?i)(\d{2}/\d{2}/\d{4})", 
+    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
-
 
 # Aplica uma expressão regular (regex) à coluna do DataFrame e retorna os dados extraídos.
 def aplicar_regex_em_coluna(df, coluna, regex):
@@ -62,9 +61,45 @@ def executar(df):
             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
 
         campos_mapeados[campo] = coluna_selecionada
-        campos_com_tratamento[campo] = precisa_tratar    
+        campos_com_tratamento[campo] = precisa_tratar
+    
     #---------------------------------------------------------------------------------------------------------------------
-   
+
+
+    
+    #---------------------------------------------------------------------------------------------------------------------
+    # col_esq, col_dir = st.columns([3, 2])
+
+    # #st.markdown("---")
+    
+    # with col_esq:
+    #     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
+    #     st.dataframe(df.head(10), use_container_width=True)
+
+    # with col_dir:
+    #     st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
+    #     for i, campo in enumerate(CAMPOS_LOGICOS):
+    #         campos, sel_col, chk = st.columns([2, 2, 1])
+
+    #         with campos:
+    #             st.markdown(f"`{campo}`")
+
+    #         with sel_col:
+    #             coluna_selecionada = st.selectbox(
+    #                 "",
+    #                 colunas,
+    #                 key=f"sel_col_{i}"
+    #             )
+
+    #         with chk:
+    #             precisa_tratar = st.checkbox("Ajustar?", key=f"chk_regex_{i}", value=True)
+
+    #         campos_mapeados[campo] = coluna_selecionada
+    #         campos_com_tratamento[campo] = precisa_tratar
+
+    # #st.markdown("---")
+    #---------------------------------------------------------------------------------------------------------------------
+    
     df_resultado = pd.DataFrame()
 
     for campo, coluna in campos_mapeados.items():
@@ -107,4 +142,3 @@ def executar(df):
     #     if "extracao_titulos" not in st.session_state["etapas_concluidas"]:
     #         st.session_state["etapas_concluidas"].append("extracao_titulos")
     #     st.experimental_rerun()
-
