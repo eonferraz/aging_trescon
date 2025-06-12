@@ -14,7 +14,7 @@ CAMPOS_BAIXAS = [
 # Regex sugerida para cada campo
 REGEX_SUGERIDA = {
     # Fornecedor/Cliente
-    "Fornecedor/Cliente": r"(?i)(?:CLIENTE[:\- ]+|DE\s+)?([A-Z0-9\s\.\-/]+?)(?:\s+RECLASS|\s+LANCTO|\s+REF|\s*$)",
+    "Fornecedor/Cliente": r"(?i)(?:DEV\s+NF\s+\d+\s+CF\s+NF\s+\d+\s+DE\s+)([A-Z0-9\s\.\-/]+)",
 
     # Número do Título
     "Número do Título": r"(?i)(?:NF[:\- ]*|NFE[:\- ]*|REF\s*NF\s*|CF\s*NF\s*|TIT\s*AB[-\s]*|EXPORT[:\- ]*|SERV[:\- ]*)?(\d{5,})",
