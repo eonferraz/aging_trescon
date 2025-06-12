@@ -34,6 +34,12 @@ def aplicar_regex_em_coluna(df, coluna, regex):
         st.error(f"Erro ao aplicar regex na coluna '{coluna}': {e}")
         return None
 
+def limpar_fornecedor(texto):
+    texto = re.sub(r"\bNFE\b", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\bCLIENTE:\s*", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\bDE\b", "", texto, flags=re.IGNORECASE)
+    texto = re.sub(r"\b\d{1,6}\b", "", texto)  # Remove números de até 6 dígitos isolados
+    return texto.strip()
 
 def executar(df):
     if df.empty or df.shape[1] == 0:
@@ -86,6 +92,8 @@ def executar(df):
             df_resultado[campo] = valores_convertidos.round(2)
         elif campo == "Data de Pagamento":
             df_resultado[campo] = pd.to_datetime(valores_finais, errors="coerce", dayfirst=True)
+        elif campo == "Fornecedor/Cliente":
+            df_resultado[campo] = valores_finais.apply(limpar_fornecedor)
         else:
             df_resultado[campo] = valores_finais
 
