@@ -137,8 +137,8 @@ def executar(df):
 
     st.success("Extração concluída com sucesso.")
 
-    if st.button("\u27a1\ufe0f Próximo"):
-        st.session_state["etapa"] = "proxima_etapa"
-        st.experimental_rerun()
+    # if st.button("\u27a1\ufe0f Próximo"):
+    #     st.session_state["etapa"] = "proxima_etapa"
+    #     st.experimental_rerun()
 
     #st.markdown("---")
