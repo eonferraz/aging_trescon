@@ -114,7 +114,9 @@ def executar(df):
     # Remove registros sem data de pagamento
     df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
 
-    st.dataframe(df_resultado, use_container_width=True)
+    # Deixa apenas o Fornecedor Ajustado 3
+    campos_visiveis = ["Fornecedor Ajustado 3"] if "Fornecedor Ajustado 3" in df_resultado.columns else df_resultado.columns.tolist()
+    st.dataframe(df_resultado[campos_visiveis], use_container_width=True)
     st.session_state["df_baixas"] = df_resultado
 
     # Aplica de-para SOMENTE NO DATAFRAME CONCILIADO
@@ -129,4 +131,4 @@ def executar(df):
 
             # Exibe prévia com Fornecedor Ajustado 3
             st.markdown("#### ✅ Prévia do Conciliado com Fornecedor Ajustado 3")
-            st.dataframe(df_conciliado.head(), use_container_width=True)
+            st.dataframe(df_conciliado[["Fornecedor Ajustado 3"] + [col for col in df_conciliado.columns if col != "Fornecedor Ajustado 3"]], use_container_width=True)
