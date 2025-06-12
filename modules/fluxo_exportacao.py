@@ -2,7 +2,7 @@
 import streamlit as st
 from modules.exportar_excel import executar as exportar_excel  # ✅ corrigido para refletir o novo local
 
-def executar():
+def exportar_excel():
     st.markdown("#### 📤 Exportação do Relatório de Conciliação")
 
     if "df_conciliado" not in st.session_state:
