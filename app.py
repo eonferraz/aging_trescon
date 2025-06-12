@@ -44,50 +44,32 @@ aplicar_css()
 #=======================================================================================================================================
 
 
-# MENU LATERAL
+# ETAPAS
 #=======================================================================================================================================
-# Chama o menu lateral
-exibir_menu_lateral()
+with st.expander("1️⃣ Importação dos Títulos Financeiros", expanded=True):
+    fluxo_importacao_titulos.executar()
 
-# Inicializa o estado das etapas concluídas
-# if "etapas_concluidas" not in st.session_state:
-#     st.session_state["etapas_concluidas"] = []
-if "etapas_concluidas" not in st.session_state or not isinstance(st.session_state["etapas_concluidas"], list):
-    st.session_state["etapas_concluidas"] = []
+with st.expander("2️⃣ Extração de Campos dos Títulos"):
+    if "df_titulos" in st.session_state:
+        fluxo_extracao_titulos.executar()
 
+with st.expander("3️⃣ Importação das Baixas"):
+    if "df_titulos" in st.session_state:
+        fluxo_importacao_baixas.executar()
 
-# Etapa 1 - Importação Títulos
-fluxo_importacao_titulos.executar()
+with st.expander("4️⃣ Extração das Baixas"):
+    if "df_baixas" in st.session_state:
+        fluxo_extracao_baixas.executar()
 
-# Etapa 2 - Extração Títulos (se df_titulos estiver presente)
-if "df_titulos" in st.session_state:
-    fluxo_extracao_titulos.executar()
-    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
+with st.expander("5️⃣ Conciliação"):
+    if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
+        fluxo_conciliacao.executar()
 
-
-# Etapa 3 - Importação Baixas
-if "extracao_titulos" in st.session_state["etapas_concluidas"]:
-    fluxo_importacao_baixas.executar()
-    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
-
-# Etapa 4 - Extração Baixas
-if "df_baixas" in st.session_state:
-    fluxo_extracao_baixas.executar()
-    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
-
-# Etapa 5 - Conciliação
-if "extracao_baixas" in st.session_state["etapas_concluidas"]:
-    fluxo_conciliacao.executar()
-    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
-
-# Etapa 6 - Exportação
-if "conciliacao" in st.session_state["etapas_concluidas"]:
-    fluxo_exportacao.executar()
-    st.markdown("<hr style='border: 1px dashed #CCC;'>", unsafe_allow_html=True)
+with st.expander("6️⃣ Exportação"):
+    if "conciliacao_finalizada" in st.session_state:
+        fluxo_exportacao.executar()
 
 #=======================================================================================================================================
-
-
 
 #Chama o rodapé
 exibir_rodape()
