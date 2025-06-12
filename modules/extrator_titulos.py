@@ -45,8 +45,7 @@ def executar(df):
     st.markdown("---")
     st.markdown("<div class='custom-subheader'>Visualização dos Dados Importados</div>", unsafe_allow_html=True)
     st.dataframe(df.head(5), use_container_width=True)
-
-    st.markdown("---")
+    
     st.markdown("<div class='custom-subheader'>Mapeamento dos Campos</div>", unsafe_allow_html=True)
 
     col_map_1, col_map_2, col_map_3, col_map_4, col_map_5 = st.columns(5)
@@ -63,7 +62,7 @@ def executar(df):
 
         campos_mapeados[campo] = coluna_selecionada
         campos_com_tratamento[campo] = precisa_tratar
-
+    
     #---------------------------------------------------------------------------------------------------------------------
 
 
@@ -129,7 +128,8 @@ def executar(df):
                 )
             else:
                 df_resultado[campo] = df[coluna].fillna("")
-
+                
+    st.markdown("---")
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=False)
     
