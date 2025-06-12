@@ -13,11 +13,11 @@ CAMPOS_LOGICOS = [
 
 # Expressões regulares sugeridas por campo
 REGEX_SUGERIDA = {
+    "Fornecedor": r"(?i)(?:CLIENTE[:\- ]*|DE\s+)([A-Z0-9\s\/\.\-]+(?:LTDA|LTD|S\/A)?)"
     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-    "Data da Baixa": r"(?i)(\d{2}/\d{2}/\d{4})",
-    "Valor da Baixa": r"(?i)VALOR[:\- R$]*([\d\.,]+)",
-    "Documento": r"(?i)DOC[:\-\s]*([\w/\\-]+)",
-    "Conta": r"(?i)CONTA[:\-\s]*(.+)"
+    "Data da Emissão": r"(?i)(\d{2}/\d{2}/\d{4})",
+    "Data de Vencimento": r"(?i)(\d{2}/\d{2}/\d{4})", 
+    "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
 
