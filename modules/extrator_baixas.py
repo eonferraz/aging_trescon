@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import re
-import os
 
 # Campos esperados para extração
 CAMPOS_BAIXAS = [
@@ -27,15 +26,6 @@ REGEX_SUGERIDA = {
     "Valor Pago": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
 
-# Carrega de-para de fornecedores
-CAMINHO_DEPARA = "depara.xlsx"
-DEPARA_FORNECEDORES = {}
-if os.path.exists(CAMINHO_DEPARA):
-    try:
-        df_depara = pd.read_excel(CAMINHO_DEPARA, dtype=str)
-        DEPARA_FORNECEDORES = dict(zip(df_depara['de'].str.upper().str.strip(), df_depara['para'].str.strip()))
-    except Exception as e:
-        st.warning(f"Erro ao carregar de-para de fornecedores: {e}")
 
 def aplicar_regex_em_coluna(df, coluna, regex):
     try:
@@ -49,11 +39,7 @@ def limpar_fornecedor(texto):
     texto = re.sub(r"\bCLIENTE:\s*", "", texto, flags=re.IGNORECASE)
     texto = re.sub(r"\bDE\b", "", texto, flags=re.IGNORECASE)
     texto = re.sub(r"\b\d{1,6}\b", "", texto)  # Remove números de até 6 dígitos isolados
-    return texto.strip().upper()
-
-def aplicar_depara(valor):
-    chave = valor.strip().upper()
-    return DEPARA_FORNECEDORES.get(chave, valor)
+    return texto.strip()
 
 def executar(df):
     if df.empty or df.shape[1] == 0:
@@ -65,7 +51,7 @@ def executar(df):
     campos_com_tratamento = {}
 
     #-------------------------------------------------------------------------------------------------------------------
-    st.markdown("#### 🧹 Mapeamento de Campos para Baixas")
+    st.markdown("#### 🧽 Mapeamento de Campos para Baixas")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -107,26 +93,12 @@ def executar(df):
         elif campo == "Data de Pagamento":
             df_resultado[campo] = pd.to_datetime(valores_finais, errors="coerce", dayfirst=True)
         elif campo == "Fornecedor/Cliente":
-            df_resultado["Fornecedor Ajustado 2"] = valores_finais.apply(limpar_fornecedor)
+            df_resultado[campo] = valores_finais.apply(limpar_fornecedor)
         else:
             df_resultado[campo] = valores_finais
 
     # Remove registros sem data de pagamento
     df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
 
-    # Aplica de-para SOMENTE NO DATAFRAME CONCILIADO
-    if "df_conciliado" in st.session_state:
-        df_conciliado = st.session_state["df_conciliado"]
-        if "Fornecedor Ajustado 2" in df_conciliado.columns:
-            # Inserir logo após "Fornecedor Ajustado 2"
-            cols = df_conciliado.columns.tolist()
-            idx = cols.index("Fornecedor Ajustado 2") + 1
-            df_conciliado.insert(loc=idx, column="Fornecedor Ajustado 3", value=df_conciliado["Fornecedor Ajustado 2"].apply(aplicar_depara))
-            st.session_state["df_conciliado"] = df_conciliado
-
-            # Exibe apenas Fornecedor Ajustado 3
-            st.markdown("#### ✅ Relatório Analítico de Conciliação")
-            st.dataframe(df_conciliado[["Fornecedor Ajustado 3"]], use_container_width=True)
-
-    # Atualiza o session_state com df_resultado
+    st.dataframe(df_resultado, use_container_width=True)
     st.session_state["df_baixas"] = df_resultado
