@@ -12,10 +12,18 @@ CAMPOS_LOGICOS = [
 ]
 
 # Expressões regulares sugeridas por campo
+# REGEX_SUGERIDA = {
+#     "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
+#     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
+#     "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+#     "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+#     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
+# }
+
 REGEX_SUGERIDA = {
-    "Fornecedor": r"(?i)CLIENTE\s*[:\-]?\s*(.+)",
+    "Fornecedor": r"(?i)(?:CLIENTE[:\-]?\s*|DE\s+|NF\s+\d+\s+DE\s+|EXPORT[:\-]?\s*|RECEITA\s+NF\S*\s*[:\-]?\s*|INCL\s+TIT\s+AB\S*\s+DE\s+)?([A-Z0-9\s\.\-\/]+?(?:LTDA|S\/A|SA|LTD|Ltda|S.A.))",
     "Número do Título": r"(?i)(?:NF(?:E)?[:\- ]*)(\d{6,})",
-    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
+    "Data de Emissão": r"(?i)EMISS(?:AO|ÃO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
     "Data de Vencimento": r"(?i)VENC(?:TO|IMENTO)?[:\- ]+(\d{2}/\d{2}/\d{4})",
     "Valor do Título": r"(?i)VALOR[:\- R$]*([\d\.,]+)"
 }
