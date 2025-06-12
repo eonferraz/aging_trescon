@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import io
 from unidecode import unidecode
+from rapidfuzz import fuzz, process
 
 def exportar_excel(df: pd.DataFrame):
     output = io.BytesIO()
@@ -21,8 +22,23 @@ def normalizar_fornecedor(nome):
     nome = nome.replace(" LTDA", "").replace(" LTDA.", "").replace(" LTD", "").replace(" LTD.", "")
     nome = nome.replace(" S/A", "").replace(" S. A.", "")
     nome = nome.replace("AUTOMOVEIS", "").replace("AUTOM", "")
+    nome = nome.replace(" COM E PARTIC", "")
+    nome = nome.replace(" - ARMAZEM AILN", "")
     nome = nome.strip()
     return nome
+
+def mapear_fuzzy(lista_nomes, threshold=85):
+    nomes_base = []
+    grupos = {}
+    for nome in lista_nomes:
+        nome_base = normalizar_fornecedor(nome)
+        melhor, score = process.extractOne(nome_base, nomes_base, scorer=fuzz.token_sort_ratio)
+        if score and score >= threshold:
+            grupos[nome] = melhor
+        else:
+            nomes_base.append(nome_base)
+            grupos[nome] = nome_base
+    return grupos
 
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
@@ -83,7 +99,10 @@ def executar():
 
     df["FORNECEDOR CONSIDERADO"] = df["FORNECEDOR TITULO"]
     df.loc[df["TIPO"] == "Baixa", "FORNECEDOR CONSIDERADO"] = df["FORNECEDOR BAIXA"]
-    df["FORNECEDOR AJUSTADO"] = df["FORNECEDOR CONSIDERADO"].apply(normalizar_fornecedor)
+
+    # Aplica agrupamento inteligente
+    mapa_fuzzy = mapear_fuzzy(df["FORNECEDOR CONSIDERADO"].unique())
+    df["FORNECEDOR AJUSTADO"] = df["FORNECEDOR CONSIDERADO"].map(mapa_fuzzy)
 
     # Calcula status por documento
     status_map = {}
