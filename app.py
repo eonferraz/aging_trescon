@@ -78,8 +78,6 @@ elif st.session_state["etapa"] == "exportacao":
 
 
 # 01. Importação da planilha de títulos
-st.markdown("<div class='custom-subheader'>1️⃣ Importação dos Títulos</div>", unsafe_allow_html=True)
-
 fluxo_extracao_titulos.executar()
 
 
