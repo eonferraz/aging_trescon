@@ -26,9 +26,8 @@ def executar():
             if aba_selecionada:
                 df = pd.read_excel(arquivo, sheet_name=aba_selecionada)
                 st.session_state["df_baixas"] = df
-
-                with st.expander("📋 Visualizar dados de baixas importados"):
-                    st.dataframe(df, use_container_width=True)
+                
+                st.dataframe(df, use_container_width=True)
 
         except Exception as e:
             st.error(f"Erro ao processar o arquivo: {e}")
