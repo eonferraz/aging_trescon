@@ -7,12 +7,14 @@ from unidecode import unidecode
 from rapidfuzz import fuzz, process
 
 # Carrega de-para de fornecedores
-CAMINHO_DEPARA = "depara.xlsx"
+CAMINHO_DEPARA = "depara_fornecedores.xlsx"
 DEPARA_FORNECEDORES = {}
 if os.path.exists(CAMINHO_DEPARA):
     try:
         df_depara = pd.read_excel(CAMINHO_DEPARA, dtype=str)
-        DEPARA_FORNECEDORES = dict(zip(df_depara['de'].str.upper().str.strip(), df_depara['para'].str.strip()))
+        df_depara['de'] = df_depara['de'].str.upper().str.strip()
+        df_depara['para'] = df_depara['para'].str.strip()
+        DEPARA_FORNECEDORES = dict(zip(df_depara['de'], df_depara['para']))
     except Exception as e:
         st.warning(f"Erro ao carregar de-para de fornecedores: {e}")
 
@@ -35,6 +37,9 @@ def normalizar_fornecedor(nome):
     nome = nome.replace("AUTOMOVEIS", "").replace("AUTOM", "")
     nome = nome.replace(" COM E PARTIC", "")
     nome = nome.replace(" - ARMAZEM AILN", "")
+    nome = nome.replace(" CLIENTE:", "")
+    nome = nome.replace(" DE ", " ")
+    nome = ' '.join([w for w in nome.split() if not w.isdigit() and w != "NFE"])
     nome = nome.strip()
     return nome
 
