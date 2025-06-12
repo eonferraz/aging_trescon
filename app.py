@@ -16,7 +16,6 @@ from utils.cabecalho import exibir_cabecalho
 from utils.rodape import exibir_rodape
 from utils.menu_etapas import exibir_menu_lateral
 
-
 #Importação dos modulos
 from modules import (
     fluxo_importacao_titulos,
@@ -44,7 +43,14 @@ aplicar_css()
 #=======================================================================================================================================
 
 
-# ETAPAS
+# MENU LATERAL
+#=======================================================================================================================================
+# Chama o menu lateral
+exibir_menu_lateral()
+#=======================================================================================================================================
+
+
+# ETAPAS EM FORMATO EXPANSÍVEL
 #=======================================================================================================================================
 with st.expander("1️⃣ Importação dos Títulos Financeiros", expanded=True):
     fluxo_importacao_titulos.executar()
@@ -68,8 +74,8 @@ with st.expander("5️⃣ Conciliação"):
 with st.expander("6️⃣ Exportação"):
     if "conciliacao_finalizada" in st.session_state:
         fluxo_exportacao.executar()
-
 #=======================================================================================================================================
+
 
 #Chama o rodapé
 exibir_rodape()
