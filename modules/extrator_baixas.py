@@ -37,6 +37,8 @@ def executar(df):
     campos_mapeados = {}
     campos_com_tratamento = {}
 
+
+    #-------------------------------------------------------------------------------------------------------------------
     st.markdown("#### 🧭 Mapeamento de Campos para Baixas")
 
     col1, col2, col3, col4 = st.columns(4)
