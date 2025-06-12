@@ -65,7 +65,7 @@ def executar(df):
     campos_com_tratamento = {}
 
     #-------------------------------------------------------------------------------------------------------------------
-    st.markdown("#### 🧽 Mapeamento de Campos para Baixas")
+    st.markdown("#### 🧹 Mapeamento de Campos para Baixas")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -114,12 +114,12 @@ def executar(df):
     # Remove registros sem data de pagamento
     df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
 
+    st.dataframe(df_resultado, use_container_width=True)
+    st.session_state["df_baixas"] = df_resultado
+
     # Aplica de-para SOMENTE NO DATAFRAME CONCILIADO
     if "df_conciliado" in st.session_state:
         df_conciliado = st.session_state["df_conciliado"]
         if "Fornecedor Ajustado 2" in df_conciliado.columns:
             df_conciliado["Fornecedor Ajustado 3"] = df_conciliado["Fornecedor Ajustado 2"].apply(aplicar_depara)
             st.session_state["df_conciliado"] = df_conciliado
-
-    st.dataframe(df_resultado, use_container_width=True)
-    st.session_state["df_baixas"] = df_resultado
