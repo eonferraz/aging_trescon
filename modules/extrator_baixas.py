@@ -80,8 +80,9 @@ def executar(df):
                 .str.zfill(9)
             )
         elif campo == "Valor Pago":
-            valores_limpos = valores_finais.str.replace(".", "", regex=False).str.replace(",", ".", regex=False)
-            valores_convertidos = pd.to_numeric(valores_limpos, errors="coerce")
+            valores_finais = valores_finais.str.strip()
+            valores_finais = valores_finais.apply(lambda x: x.replace(".", "").replace(",", ".") if "," in x else x)
+            valores_convertidos = pd.to_numeric(valores_finais, errors="coerce")
             df_resultado[campo] = valores_convertidos.round(2)
         else:
             df_resultado[campo] = valores_finais
