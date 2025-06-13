@@ -23,6 +23,8 @@ from modules import (
     fluxo_extracao_titulos,
     fluxo_importacao_baixas,
     fluxo_extracao_baixas,
+    fluxo_extracao_conciliado,
+    fluxo_importacao_conciliado,
     fluxo_conciliacao,
     fluxo_exportacao
 )
