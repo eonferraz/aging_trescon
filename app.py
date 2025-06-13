@@ -47,18 +47,23 @@ aplicar_css()
 
 # ETAPAS EM FORMATO EXPANSÍVEL
 #=======================================================================================================================================
-with st.expander("1️⃣ Títulos Financeiros", expanded=True):
+with st.expander("1️⃣ Conciliação Anterior", expanded=True):
+    fluxo_importacao_titulos.executar()
+    if "df_conciliacao" in st.session_state:
+        fluxo_extracao_conciliacao.executar()
+
+with st.expander("2️⃣ Títulos Novos", expanded=True):
     fluxo_importacao_titulos.executar()
     if "df_titulos" in st.session_state:
         fluxo_extracao_titulos.executar()
 
-with st.expander("2️⃣ Baixas"):
+with st.expander("3️⃣ Baixas"):
     if "df_titulos" in st.session_state:
         fluxo_importacao_baixas.executar()
         fluxo_extracao_baixas.executar()
         
         
-with st.expander("3️⃣ Conciliação"):
+with st.expander("[4] Conciliação"):
     if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
         fluxo_conciliacao.executar()2
 #=======================================================================================================================================
