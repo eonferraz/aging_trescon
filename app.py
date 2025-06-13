@@ -4,6 +4,7 @@
 #  |  _| |  __||    /|    /|  _  |  / /  
 #  | |   | |___| |\ \| |\ \| | | |./ /___
 #  \_|   \____/\_| \_\_| \_\_| |_/\_____/
+#
 
 #Importação
 from utils.config import configurar_pagina
@@ -43,12 +44,6 @@ aplicar_css()
 #=======================================================================================================================================
 
 
-# MENU LATERAL
-#=======================================================================================================================================
-# Chama o menu lateral
-# exibir_menu_lateral()
-#=======================================================================================================================================
-
 
 # ETAPAS EM FORMATO EXPANSÍVEL
 #=======================================================================================================================================
@@ -56,24 +51,16 @@ with st.expander("1️⃣ Títulos Financeiros", expanded=True):
     fluxo_importacao_titulos.executar()
     if "df_titulos" in st.session_state:
         fluxo_extracao_titulos.executar()
-        
 
 with st.expander("2️⃣ Baixas"):
     if "df_titulos" in st.session_state:
         fluxo_importacao_baixas.executar()
         fluxo_extracao_baixas.executar()
         
-        # if "df_baixas" in st.session_state:
-        #     fluxo_extracao_baixas.executar()
         
 with st.expander("3️⃣ Conciliação"):
     if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
-        fluxo_conciliacao.executar()
-        # fluxo_exportacao.executar()       
-        
-# with st.expander("4️⃣ Exportação"):
-#     if "conciliacao_finalizada" in st.session_state:
-#         fluxo_exportacao.executar()
+        fluxo_conciliacao.executar()2
 #=======================================================================================================================================
 
 
