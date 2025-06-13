@@ -10,7 +10,7 @@ def executar():
     """
 
     # Upload do arquivo
-    arquivo = st.file_uploader_conciliador("Selecionar arquivo Excel (.xlsx)", type=["xlsx"])
+    arquivo = st.file_uploader("Selecionar arquivo Excel de baixas (.xlsx)", type=["xlsx"], key="upload_conciliado")
 
     if arquivo:
         try:
