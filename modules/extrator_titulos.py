@@ -82,8 +82,9 @@ def executar(df):
                 df_resultado[campo] = (
                     df[coluna].fillna("")
                     .astype(str)
-                    .str.replace(".0", "", regex=False)
+                    .str.replace(".0", "", regex=False)                    
                     .str.strip()
+                    .str.strip("-")            # remove hífens do início e do fim
                     .str.zfill(9)
                 )
             else:
