@@ -62,10 +62,9 @@ with st.expander("3️⃣ Baixas"):
         fluxo_importacao_baixas.executar()
         fluxo_extracao_baixas.executar()
         
-        
 with st.expander("[4] Conciliação"):
     if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
-        fluxo_conciliacao.executar()2
+        fluxo_conciliacao.executar()
 #=======================================================================================================================================
 
 
