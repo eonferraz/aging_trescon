@@ -46,7 +46,6 @@ aplicar_css()
 #=======================================================================================================================================
 
 
-
 # ETAPAS EM FORMATO EXPANSÍVEL
 #=======================================================================================================================================
 with st.expander("1️⃣ Conciliação Anterior", expanded=True):
@@ -54,7 +53,7 @@ with st.expander("1️⃣ Conciliação Anterior", expanded=True):
     if "df_conciliacao" in st.session_state:
         fluxo_extracao_conciliacao.executar()
 
-with st.expander("2️⃣ Títulos Novos", expanded=True):
+with st.expander("2️⃣ Títulos Novos"):
     fluxo_importacao_titulos.executar()
     if "df_titulos" in st.session_state:
         fluxo_extracao_titulos.executar()
