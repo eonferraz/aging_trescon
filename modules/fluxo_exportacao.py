@@ -1,13 +1,12 @@
 # modules/fluxo_exportacao.py
 import streamlit as st
-from modules.exportar_excel_util import exportar_excel
+from modules.fluxo_conciliacao import exportar_excel
 
-def exportar_excel():
-    st.markdown("#### 📤 Exportação do Relatório de Conciliação")
-
+def executar():
     if "df_conciliado" not in st.session_state:
-        st.warning("O relatório de conciliação ainda não foi gerado.")
+        st.warning("⚠️ Nenhum dado conciliado encontrado para exportação.")
         return
 
     df = st.session_state["df_conciliado"]
+    st.markdown("### 📤 Exportação da Conciliação")
     exportar_excel(df)
