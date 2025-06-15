@@ -82,8 +82,14 @@ def executar(df):
             else:
                 df_resultado[campo] = df[coluna].fillna("")
 
-    # Remove linhas sem Data de Emissão
-    df_resultado = df_resultado[df_resultado["Data de Emissão"].str.len() > 0]
+    # ✅ Correção do erro: garante que a coluna seja string válida
+    df_resultado = df_resultado[
+        df_resultado["Data de Emissão"]
+        .astype(str)
+        .str.strip()
+        .replace("nan", "")
+        .str.len() > 0
+    ]
 
     st.markdown("### Dados extraídos da Conciliação Anterior")
     st.dataframe(df_resultado, use_container_width=True)
