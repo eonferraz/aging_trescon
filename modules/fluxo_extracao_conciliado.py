@@ -88,6 +88,6 @@ def executar(df):
     st.markdown("### Dados extraídos da Conciliação Anterior")
     st.dataframe(df_resultado, use_container_width=True)
 
-    st.session_state["df_conciliado_anterior"] = df_resultado
+    st.session_state["df_conciliado_bruto"] = df
 
     st.success("Extração da conciliação anterior concluída com sucesso.")
