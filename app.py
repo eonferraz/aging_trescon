@@ -64,7 +64,11 @@ aplicar_css()
 #=======================================================================================================================================
 with st.expander("1️⃣ Conciliação Anterior", expanded=True):
     fluxo_importacao_conciliado.executar()
-    fluxo_extracao_conciliado.executar(st.session_state["df_conciliado_bruto"])
+    if "df_conciliado_bruto" in st.session_state:
+        fluxo_extracao_conciliado.executar(st.session_state["df_conciliado_bruto"])
+    else:
+        st.warning("Você precisa importar a conciliação anterior primeiro.")
+
 
 with st.expander("2️⃣ Títulos Novos"):
     fluxo_importacao_titulos.executar()
