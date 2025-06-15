@@ -69,33 +69,34 @@ with st.expander("1️⃣ Conciliação Anterior", expanded=True):
     else:
         st.warning("Você precisa importar a conciliação anterior primeiro.")
 
-
-with st.expander("2️⃣ Títulos Novos"):
+with st.expander("2️⃣ Títulos Novos", expanded=True):
     fluxo_importacao_titulos.executar()
-    fluxo_extracao_titulos.executar()
-    # if "df_titulos" in st.session_state:
-    #     fluxo_extracao_titulos.executar()
+    if "df_titulos" in st.session_state:
+        fluxo_extracao_titulos.executar()
+    else:
+        st.warning("Você precisa importar os títulos antes de extrair.")
 
-with st.expander("3️⃣ Unificar Títulos + Conciliação Anterior"):
-    fluxo_unificacao_titulos_conciliado.executar()
+with st.expander("3️⃣ Unificar Títulos + Conciliação Anterior", expanded=True):
+    if "df_titulos_extraido" in st.session_state and "df_conciliado_extraido" in st.session_state:
+        fluxo_unificacao_titulos_conciliado.executar()
+    else:
+        st.warning("Importe e extraia os títulos e a conciliação anterior antes de unificar.")
 
-
-with st.expander("4️⃣ Baixas"):
+with st.expander("4️⃣ Baixas", expanded=True):
     fluxo_importacao_baixas.executar()
-    fluxo_extracao_baixas.executar()
-    # if "df_titulos" in st.session_state:
-    #     fluxo_importacao_baixas.executar()
-    #     fluxo_extracao_baixas.executar()
+    if "df_baixas" in st.session_state:
+        fluxo_extracao_baixas.executar()
+    else:
+        st.warning("Você precisa importar as baixas antes de extrair.")
 
-
-with st.expander("5️⃣ Conciliação"):
-    fluxo_conciliacao.executar()
-    fluxo_exportacao.executar()
-    
-    # if "df_baixas" in st.session_state and "df_titulos" in st.session_state:
-    #     fluxo_conciliacao.executar()
+with st.expander("5️⃣ Conciliação Final", expanded=True):
+    if "df_unificado" in st.session_state and "df_baixas_extraido" in st.session_state:
+        fluxo_conciliacao.executar()
+        fluxo_exportacao.executar()
+    else:
+        st.warning("A conciliação só pode ser feita após unificar os títulos e extrair as baixas.")
 #=======================================================================================================================================
 
-
-#Chama o rodapé
+# Rodapé
 exibir_rodape()
+#=======================================================================================================================================
