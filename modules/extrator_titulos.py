@@ -1,3 +1,4 @@
+# modules/fluxo_extracao_titulos.py
 import streamlit as st
 import pandas as pd
 import re
@@ -20,12 +21,18 @@ REGEX_SUGERIDA = {
 }
 
 # Aplica uma expressão regular (regex) com fallback ao valor original
-
 def aplicar_regex_com_fallback(df, coluna, regex):
     try:
-        extraido = df[coluna].astype(str).str.extract(regex, expand=False)
+        extraido = df[coluna].astype(str).str.extract(regex, expand=True)
+
+        if isinstance(extraido, pd.DataFrame):
+            extraido_final = extraido.bfill(axis=1).iloc[:, 0]
+        else:
+            extraido_final = extraido
+
         fallback = df[coluna].astype(str)
-        return extraido.where(extraido.notnull(), fallback)
+        return extraido_final.where(extraido_final.notnull(), fallback)
+
     except Exception as e:
         st.error(f"Erro ao aplicar regex na coluna '{coluna}': {e}")
         return df[coluna].astype(str)
@@ -73,6 +80,7 @@ def executar(df):
                     .astype(str)
                     .str.replace(".0", "", regex=False)
                     .str.strip()
+                    .str.strip("-")
                     .str.zfill(9)
                 )
             else:
@@ -82,9 +90,9 @@ def executar(df):
                 df_resultado[campo] = (
                     df[coluna].fillna("")
                     .astype(str)
-                    .str.replace(".0", "", regex=False)                    
+                    .str.replace(".0", "", regex=False)
                     .str.strip()
-                    .str.strip("-")            # remove hífens do início e do fim
+                    .str.strip("-")
                     .str.zfill(9)
                 )
             else:
@@ -98,6 +106,6 @@ def executar(df):
     st.markdown("### Dados extraídos (tratados)")
     st.dataframe(df_resultado, use_container_width=True)
 
-    st.session_state["df_titulos"] = df_resultado
+    st.session_state["df_titulos_extraido"] = df_resultado
 
     st.success("Extração concluída com sucesso.")
