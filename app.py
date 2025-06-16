@@ -77,10 +77,12 @@ with st.expander("2️⃣ Títulos Novos", expanded=True):
         st.warning("Você precisa importar os títulos antes de extrair.")
 
 with st.expander("3️⃣ Unificar Títulos + Conciliação Anterior", expanded=True):
-    if "df_titulos_extraido" in st.session_state and "df_conciliado_extraido" in st.session_state:
+    if "df_titulos_extraido" in st.session_state and "df_conciliado_bruto" in st.session_state:
         fluxo_unificacao_titulos_conciliado.executar()
     else:
         st.warning("Importe e extraia os títulos e a conciliação anterior antes de unificar.")
+
+
 
 with st.expander("4️⃣ Baixas", expanded=True):
     fluxo_importacao_baixas.executar()
