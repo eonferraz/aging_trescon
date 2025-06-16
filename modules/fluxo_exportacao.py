@@ -9,4 +9,3 @@ def executar():
 
     df = st.session_state["df_conciliado"]
     st.markdown("### 📤 Exportação da Conciliação")
-    exportar_excel(df)
