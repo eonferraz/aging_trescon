@@ -73,12 +73,12 @@ def mapear_fuzzy(lista_nomes, threshold=85):
 def executar():
     st.markdown("#### ⚖️ Relatório Analítico de Conciliação")
 
-    if "df_titulos" not in st.session_state or "df_baixas" not in st.session_state:
-        st.warning("Títulos e/ou Baixas ainda não foram carregados.")
+    if "df_unificado" not in st.session_state or "df_baixas_extraido" not in st.session_state:
+        st.warning("Títulos unificados e/ou Baixas ainda não foram carregados.")
         return
 
-    df_titulos = st.session_state["df_titulos"].copy()
-    df_baixas = st.session_state["df_baixas"].copy()
+    df_titulos = st.session_state["df_unificado"].copy()
+    df_baixas = st.session_state["df_baixas_extraido"].copy()
 
     titulos = df_titulos.rename(columns={
         "Fornecedor": "FORNECEDOR TITULO",
@@ -156,7 +156,7 @@ def executar():
 
     df["STATUS DA CONCILIAÇÃO"] = df["NUMERO DOC"].map(status_map)
 
-    df = df[[
+    df = df[[  # colunas finais do relatório
         "TIPO", "FORNECEDOR TITULO", "FORNECEDOR BAIXA", "FORNECEDOR AJUSTADO 3",
         "NUMERO DOC TITULO", "NUMERO DOC BAIXA", "NUMERO DOC",
         "EMISSAO", "VENCIMENTO", "DATA PAGAMENTO",
