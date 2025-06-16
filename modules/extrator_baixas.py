@@ -101,4 +101,5 @@ def executar(df):
     df_resultado = df_resultado[df_resultado["Data de Pagamento"].notna()].reset_index(drop=True)
 
     st.dataframe(df_resultado, use_container_width=True)
-    st.session_state["df_baixas"] = df_resultado
+    st.session_state["df_baixas_extraido"] = df_resultado
+
