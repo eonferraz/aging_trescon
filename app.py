@@ -92,6 +92,7 @@ with st.expander("4️⃣ Baixas", expanded=True):
         st.warning("Você precisa importar as baixas antes de extrair.")
 
 with st.expander("5️⃣ Conciliação Final", expanded=True):
+    st.write("DEBUG:", st.session_state.keys())
     if "df_unificado" in st.session_state and "df_baixas_extraido" in st.session_state:
         fluxo_conciliacao.executar()
         fluxo_exportacao.executar()
