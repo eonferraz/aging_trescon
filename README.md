@@ -2,7 +2,7 @@
 
 https://agingtrescon-zz8b4cvjsgwrgbxhzdsgpf.streamlit.app/
 
-. Abrindo o sistema
+## 1. Abrindo o sistema
 Acesse o aplicativo Streamlit no navegador, utilizando o link disponibilizado (ex: via GitHub Pages ou Streamlit Cloud).
 Relatório de Aging - Conciliador · Streamlit
 ________________________________________
