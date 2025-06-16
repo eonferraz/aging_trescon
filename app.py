@@ -95,7 +95,7 @@ with st.expander("5️⃣ Conciliação Final", expanded=True):
     st.write("DEBUG:", st.session_state.keys())
     if "df_unificado" in st.session_state and "df_baixas_extraido" in st.session_state:
         fluxo_conciliacao.executar()
-        fluxo_exportacao.executar()
+        # fluxo_exportacao.executar()
     else:
         st.warning("A conciliação só pode ser feita após unificar os títulos e extrair as baixas.")
 #=======================================================================================================================================
