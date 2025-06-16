@@ -22,13 +22,21 @@ def exportar_excel(df: pd.DataFrame):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter", datetime_format="dd/mm/yyyy") as writer:
         df.to_excel(writer, index=False, sheet_name="Conciliação")
+
     st.download_button(
         label="🗕️ Baixar Relatório em Excel",
         data=output.getvalue(),
         file_name="relatorio_conciliacao.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="download_conciliacao"
+        key="download_conciliacao_relatorio"  # ✅ nome único
     )
+    # st.download_button(
+    #     label="🗕️ Baixar Relatório em Excel",
+    #     data=output.getvalue(),
+    #     file_name="relatorio_conciliacao.xlsx",
+    #     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    #     key="download_conciliacao"
+    # )
 
 def normalizar_fornecedor(nome):
     nome = unidecode(str(nome)).upper()
